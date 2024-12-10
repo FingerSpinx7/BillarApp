@@ -35,7 +35,7 @@ class pruebas : AppCompatActivity() {
 
                     }*/
 
-                val supabaseResponse = supabaseBillar.from("TablaPruebas").select(columns = Columns.list("id, nombre")){
+                val supabaseResponse = supabaseBillar().from("TablaPruebas").select(columns = Columns.list("id, nombre")){
                     filter {
                         TablaPruebas::id eq "2"
                     }
