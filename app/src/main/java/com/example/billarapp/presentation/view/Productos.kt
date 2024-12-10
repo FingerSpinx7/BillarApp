@@ -63,112 +63,91 @@ fun ShowContent(){
 
 @Composable
 fun ProductosScreen() {
+    val productos = remember { mutableStateListOf<Producto>() }
+    val coroutineScope = rememberCoroutineScope()
 
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color(0xFFFFCD6D))
-
-    ) {
-        // Header
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(70.dp)
-                .background(Color(0xFFB7BABC)),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Button(
-                onClick = { /* Acción para volver atrás */ },
-                colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
-                modifier = Modifier.width(70.dp)
-            ) {
-                Text("Back")
+    LaunchedEffect(Unit) {
+        coroutineScope.launch {
+            try {
+                val data = supabaseBillar()
+                    .from("Productos")
+                    .select()
+                    .decodeList<Producto>()
+                productos.addAll(data)
+            } catch (e: Exception) {
+                e.printStackTrace()
+                Log.e("dbg", "Error: ${e.message}")
             }
         }
+    }
 
-        Spacer(modifier = Modifier.height(16.dp))
+    val tableHeaders = listOf("Id prod.", "Id prov.", "Producto", "Precio", "Stock")
 
-        Text(
-            text = "Productos",
-            fontSize = 40.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color(0xFF0B0E1D),
-            modifier = Modifier.align(Alignment.CenterHorizontally)
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Text(
-            text = "Lista de productos",
-            fontSize = 30.sp,
-            color = Color(0xFF4A4D5D),
-            modifier = Modifier.align(Alignment.CenterHorizontally)
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        val productos = remember { mutableStateListOf<Producto>() }
-        val coroutineScope = rememberCoroutineScope()
-
-        LaunchedEffect(Unit) {
-            coroutineScope.launch {
-                try {
-                    // Decodificación de datos desde Supabase
-                    val data = supabaseBillar()
-                        .from("Productos")
-                        .select()
-                        .decodeList<Producto>() // Decodificar directamente en objetos Producto
-                    productos.addAll(data)
-
-                } catch (e: Exception) {
-                    e.printStackTrace() // Manejar errores si ocurren
-                    Log.e("dbg", "Error: ${e.message}")
+    Scaffold(
+        topBar = {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(70.dp)
+                    .background(Color(0xFFB7BABC)),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Button(
+                    onClick = { /* Acción para volver atrás */ },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
+                    modifier = Modifier.width(70.dp)
+                ) {
+                    Text("Back")
                 }
             }
-        }
-        val tableHeaders= listOf("Id prod.", "Id prov.", "Producto","Precio","Stock")
-
-        Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-            Box (
+        },
+        bottomBar = {
+            Row(
                 modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                Button(onClick = { /* Acción para editar producto */ }) {
+                    Text("Editar")
+                }
+                Button(onClick = { /* Acción para eliminar producto */ }) {
+                    Text("Eliminar")
+                }
+                Button(onClick = { /* Acción para añadir producto */ }) {
+                    Text("Añadir producto")
+                }
+            }
+        },
+        content = { innerPadding ->
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color(0xFFFFCD6D))
                     .padding(innerPadding)
-                    .padding(16.dp)
-                    .fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ){
+            ) {
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    text = "Productos",
+                    fontSize = 40.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFF0B0E1D),
+                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = "Lista de productos",
+                    fontSize = 30.sp,
+                    color = Color(0xFF4A4D5D),
+                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                )
+                Spacer(modifier = Modifier.height(16.dp))
                 BeeTablesCompose(data = productos, headerTableTitles = tableHeaders)
             }
         }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Button(
-            onClick = { /* Acción para editar producto */ },
-            modifier = Modifier.padding(end = 8.dp)
-        ) {
-            Text("Editar")
-        }
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Button(
-            onClick = { /* Acción para eliminar producto */ }) {
-            Text("Eliminar")
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Botón Añadir producto
-        Button(
-            onClick = { /* Acción para redirigir a añadir producto */ },
-            modifier = Modifier.align(Alignment.CenterHorizontally),
-
-        ) {
-            Text("Añadir producto")
-        }
-    }
+    )
 }
+
 
 
 
