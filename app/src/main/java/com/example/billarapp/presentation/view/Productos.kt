@@ -22,6 +22,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.breens.beetablescompose.BeeTablesCompose
 import com.example.billarapp.data.network.supabaseBillar
+import com.example.billarapp.domain.ProductoModel
+import com.example.billarapp.domain.getProductosFromDataBase
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.postgrest.from
 import kotlinx.coroutines.launch
@@ -43,14 +45,6 @@ class Productos : ComponentActivity() {
 
 
 
-@kotlinx.serialization.Serializable
-data class Producto(
-    val id_producto: Int,
-    val id_proveedor: Int,
-    val det_producto: String,
-    val precio: Float,
-    val Cantidad_Inv: Int?=0
-)
 
 
 
@@ -63,7 +57,7 @@ fun ShowContent(){
 
 @Composable
 fun ProductosScreen() {
-    val productos = remember { mutableStateListOf<Producto>() }
+    /*val productos = remember { mutableStateListOf<ProductoModel>() }
     val coroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(Unit) {
@@ -72,14 +66,16 @@ fun ProductosScreen() {
                 val data = supabaseBillar()
                     .from("Productos")
                     .select()
-                    .decodeList<Producto>()
+                    .decodeList<ProductoModel>()
                 productos.addAll(data)
             } catch (e: Exception) {
                 e.printStackTrace()
                 Log.e("dbg", "Error: ${e.message}")
             }
         }
-    }
+    }*/
+
+    val productos = getProductosFromDataBase()
 
     val tableHeaders = listOf("Id prod.", "Id prov.", "Producto", "Precio", "Stock")
 
