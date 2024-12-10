@@ -2,8 +2,10 @@ package com.example.billarapp.presentation.view
 
 import android.R.style.Theme
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.compose.setContent
 import androidx.activity.ComponentActivity
+import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -18,6 +20,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.breens.beetablescompose.BeeTablesCompose
 import com.example.billarapp.data.network.supabaseBillar
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.postgrest.from
@@ -28,55 +31,45 @@ class Productos : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
 
         setContent {
             ShowContent()
         }
+
     }
 
-
 }
-@Serializable
+
+
+
+@kotlinx.serialization.Serializable
 data class Producto(
     val id_producto: Int,
     val id_proveedor: Int,
     val det_producto: String,
-    val precio: Double,
-    val cantidad_Inv: Int
+    val precio: Float,
+    val Cantidad_Inv: Int?=0
 )
+
+
 
 @Preview(showBackground = true)
 @Composable
 fun ShowContent(){
-    ProductosScreen(supabaseBillar())
+    ProductosScreen()
 }
 
 
 @Composable
-fun ProductosScreen(supabaseBillar: SupabaseClient) {
-    val productos = remember { mutableStateListOf<Producto>() }
-    val coroutineScope = rememberCoroutineScope()
+fun ProductosScreen() {
 
-    LaunchedEffect(Unit) {
-        coroutineScope.launch {
-            try {
-                // Decodificación de datos desde Supabase
-                val data = supabaseBillar
-                    .from("Productos")
-                    .select()
-                    .decodeList<Producto>() // Decodificar directamente en objetos Producto
-                productos.addAll(data)
-            } catch (e: Exception) {
-                e.printStackTrace() // Manejar errores si ocurren
-            }
-        }
-    }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFFFFCD6D))
-            .padding(16.dp)
+
     ) {
         // Header
         Row(
@@ -116,38 +109,52 @@ fun ProductosScreen(supabaseBillar: SupabaseClient) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Tabla de productos
-        LazyColumn(
-            modifier = Modifier.fillMaxSize()
-        ) {
-            items(productos) { producto ->
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 8.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(text = producto.id_producto.toString(), fontSize = 16.sp)
-                    Text(text = producto.det_producto, fontSize = 16.sp)
-                    Text(text = producto.precio.toString(), fontSize = 16.sp)
-                    Text(text = producto.cantidad_Inv.toString(), fontSize = 16.sp)
+        val productos = remember { mutableStateListOf<Producto>() }
+        val coroutineScope = rememberCoroutineScope()
 
-                    Row {
-                        Button(
-                            onClick = { /* Acción para editar producto */ },
-                            modifier = Modifier.padding(end = 8.dp)
-                        ) {
-                            Text("Editar")
-                        }
+        LaunchedEffect(Unit) {
+            coroutineScope.launch {
+                try {
+                    // Decodificación de datos desde Supabase
+                    val data = supabaseBillar()
+                        .from("Productos")
+                        .select()
+                        .decodeList<Producto>() // Decodificar directamente en objetos Producto
+                    productos.addAll(data)
 
-                        Button(
-                            onClick = { /* Acción para eliminar producto */ }) {
-                            Text("Eliminar")
-                        }
-                    }
+                } catch (e: Exception) {
+                    e.printStackTrace() // Manejar errores si ocurren
+                    Log.e("dbg", "Error: ${e.message}")
                 }
             }
+        }
+        val tableHeaders= listOf("Id prod.", "Id prov.", "Producto","Precio","Stock")
+
+        Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+            Box (
+                modifier = Modifier
+                    .padding(innerPadding)
+                    .padding(16.dp)
+                    .fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ){
+                BeeTablesCompose(data = productos, headerTableTitles = tableHeaders)
+            }
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Button(
+            onClick = { /* Acción para editar producto */ },
+            modifier = Modifier.padding(end = 8.dp)
+        ) {
+            Text("Editar")
+        }
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Button(
+            onClick = { /* Acción para eliminar producto */ }) {
+            Text("Eliminar")
         }
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -155,7 +162,8 @@ fun ProductosScreen(supabaseBillar: SupabaseClient) {
         // Botón Añadir producto
         Button(
             onClick = { /* Acción para redirigir a añadir producto */ },
-            modifier = Modifier.align(Alignment.CenterHorizontally)
+            modifier = Modifier.align(Alignment.CenterHorizontally),
+
         ) {
             Text("Añadir producto")
         }
