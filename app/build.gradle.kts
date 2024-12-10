@@ -77,6 +77,9 @@ dependencies {
     implementation(platform(libs.supabase.bom))
     implementation(libs.supabase.postgrest)
     implementation(libs.ktor.client.android)
+    implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
+    implementation("com.github.Breens-Mbaka:BeeTablesCompose:1.0.5")
+
 
 
 
