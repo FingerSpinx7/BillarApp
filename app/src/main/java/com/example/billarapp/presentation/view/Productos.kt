@@ -1,6 +1,7 @@
 package com.example.billarapp.presentation.view
 
 import android.R.style.Theme
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.compose.setContent
@@ -15,6 +16,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
@@ -110,7 +112,13 @@ fun ProductosScreen() {
                 Button(onClick = { /* Acción para eliminar producto */ }) {
                     Text("Eliminar")
                 }
-                Button(onClick = { /* Acción para añadir producto */ }) {
+
+                val context = LocalContext.current
+
+                Button(onClick = {
+                    val intent = Intent(context, AnadirProd::class.java)
+                    context.startActivity(intent)
+                }) {
                     Text("Añadir producto")
                 }
             }
@@ -138,6 +146,7 @@ fun ProductosScreen() {
                     modifier = Modifier.align(Alignment.CenterHorizontally)
                 )
                 Spacer(modifier = Modifier.height(16.dp))
+
                 BeeTablesCompose(data = productos, headerTableTitles = tableHeaders)
             }
         }

@@ -8,4 +8,5 @@ data class ProductoModel(
     val det_producto: String,
     val precio: Float,
     val Cantidad_Inv: Int?=0
+
 )
