@@ -10,3 +10,11 @@ data class ProductoModel(
     val Cantidad_Inv: Int?=0
 
 )
+
+@kotlinx.serialization.Serializable
+data class ProveedoresModel(
+    val id_proveedor: Int,
+    val telefono: Long,
+    val nombre: String
+
+)

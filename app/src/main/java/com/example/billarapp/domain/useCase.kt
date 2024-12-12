@@ -15,7 +15,7 @@ import kotlinx.coroutines.launch
 
 
     @Composable
-    public fun getProductosFromDataBase(): SnapshotStateList<ProductoModel> {
+    fun getProductosFromDataBase(): SnapshotStateList<ProductoModel> {
         val productos = remember { mutableStateListOf<ProductoModel>() }
         val coroutineScope = rememberCoroutineScope()
 
@@ -35,4 +35,27 @@ import kotlinx.coroutines.launch
         }
 
         return productos
+    }
+
+    @Composable
+    fun getProvedoresFromDataBase(): SnapshotStateList<ProveedoresModel> {
+        val proveedores = remember { mutableStateListOf<ProveedoresModel>() }
+        val coroutineScope = rememberCoroutineScope()
+
+        LaunchedEffect(Unit) {
+            coroutineScope.launch {
+                try {
+                    val data = supabaseBillar()
+                        .from("Proveedores")
+                        .select()
+                        .decodeList<ProveedoresModel>()
+                    proveedores.addAll(data)
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    Log.e("dbg", "Error: ${e.message}")
+                }
+            }
+        }
+
+        return proveedores
     }

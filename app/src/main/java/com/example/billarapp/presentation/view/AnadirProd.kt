@@ -42,6 +42,7 @@ import androidx.compose.material3.TopAppBarColors
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -61,6 +62,8 @@ import androidx.core.view.WindowInsetsCompat
 import com.breens.beetablescompose.BeeTablesCompose
 import com.example.billarapp.R
 import com.example.billarapp.domain.getProductosFromDataBase
+
+
 
 class AnadirProd : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -177,9 +180,10 @@ private fun ProductosScreen() {
 
 @Composable
 private fun TextFieldsAnadirProd() {
-    val isDropDownExpanded = remember {
+     val isDropDownExpanded = remember {
         mutableStateOf(false)
     }
+
 
     Row (verticalAlignment = Alignment.CenterVertically){
     Column(
@@ -201,11 +205,22 @@ private fun TextFieldsAnadirProd() {
         Text(text = "Proveedores")
         IconButton(onClick = {/*Do smthng*/}) {
             Icon(Icons.Filled.ArrowDropDown, contentDescription = "Desplegar Provedoores")
-
+        }
+        ProveedoresList(
+            expanded = isDropDownExpanded.value,
+            onDismissRequest = {
+                isDropDownExpanded.value = false
+            }
+        ){
         }
 
     }
 }
+}
+
+@Composable
+fun ProveedoresList(expanded: Boolean, onDismissRequest: () -> Unit, content: () -> Unit) {
+
 }
 /*
 @Composable
@@ -214,7 +229,3 @@ fun setSystemBars(){
 
 }*/
 
-@Composable
-private fun ProveedoresList(){
-
-}
