@@ -12,6 +12,12 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Home
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -19,6 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
@@ -53,83 +60,89 @@ class Productos : AppCompatActivity() {
 
 @Preview(showBackground = true)
 @Composable
-fun ShowContent(){
+private fun ShowContent(){
     ProductosScreen()
 }
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProductosScreen() {
-    /*val productos = remember { mutableStateListOf<ProductoModel>() }
-    val coroutineScope = rememberCoroutineScope()
-
-    LaunchedEffect(Unit) {
-        coroutineScope.launch {
-            try {
-                val data = supabaseBillar()
-                    .from("Productos")
-                    .select()
-                    .decodeList<ProductoModel>()
-                productos.addAll(data)
-            } catch (e: Exception) {
-                e.printStackTrace()
-                Log.e("dbg", "Error: ${e.message}")
-            }
-        }
-    }*/
-
+private fun ProductosScreen() {
     val productos = getProductosFromDataBase()
+    val context = LocalContext.current
+    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
+
+
 
     val tableHeaders = listOf("Id prod.", "Id prov.", "Producto", "Precio", "Stock")
 
     Scaffold(
+        //TopBar de la pantalla, incluyendo colores definidos, boton de regresar y titulo
         topBar = {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(70.dp)
-                    .background(Color(0xFFB7BABC)),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Button(
-                    onClick = { /* Acción para volver atrás */ },
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
-                    modifier = Modifier.width(70.dp)
-                ) {
-                    Text("Back")
-                }
-            }
+            TopAppBar(
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                    containerColor = Color(0xFFFFCD6D),
+                    titleContentColor = Color(0xFF0B0E1D),
+                    navigationIconContentColor = Color(0xFF0B0E1D)
+                ),
+                title = {
+                    Text(
+                        "Productos",
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                },
+
+
+                navigationIcon = {
+                    /*CORREGIR CLASE LLAMADA EN LA IMPLEMENTACION DE LAS DEMAS PANTALLAS*/
+                    IconButton(onClick = {val intent = Intent(context, Productos::class.java)
+                        context.startActivity(intent)}) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Back"
+                        )
+                    }
+                },
+                scrollBehavior = scrollBehavior,
+            )
         },
+
         bottomBar = {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                horizontalArrangement = Arrangement.SpaceEvenly
-            ) {
-                Button(onClick = { /* Acción para editar producto */ }) {
-                    Text("Editar")
-                }
-                Button(onClick = { /* Acción para eliminar producto */ }) {
-                    Text("Eliminar")
-                }
+            BottomAppBar(
+                actions = {
+                    //Ese boton debe llamar al menu principal
+                    IconButton(onClick = { /* do something */ }) {
+                        Icon(Icons.Filled.Home, contentDescription = "Localized description")
+                    }
 
-                val context = LocalContext.current
+                    IconButton(onClick = { /* do something */ }) {
+                        Icon(Icons.Filled.Delete, contentDescription = "Localized description")
+                    }
 
-                Button(onClick = {
-                    val intent = Intent(context, AnadirProd::class.java)
-                    context.startActivity(intent)
-                }) {
-                    Text("Añadir producto")
-                }
-            }
+                },
+                floatingActionButton = {
+                    FloatingActionButton(
+                        onClick = { val intent = Intent(context, AnadirProd::class.java)
+                            context.startActivity(intent) },
+                        containerColor = BottomAppBarDefaults.bottomAppBarFabColor,
+                        elevation = FloatingActionButtonDefaults.bottomAppBarFabElevation(),
+
+                    ) {
+                        Icon(Icons.Filled.Add, "Add products")
+                    }
+
+                },
+
+            )
         },
         content = { innerPadding ->
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(Color(0xFFFFCD6D))
+                    .background(Color(0xFFB7BABC))
                     .padding(innerPadding)
+                    .padding(horizontal = 30.dp)
             ) {
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
