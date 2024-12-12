@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material3.BottomAppBar
@@ -41,6 +42,8 @@ import androidx.compose.material3.TopAppBarColors
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -173,12 +176,18 @@ private fun ProductosScreen() {
 }
 
 @Composable
-private fun TextFieldsAnadirProd(){
-    Column (modifier = Modifier
-        .fillMaxSize(),
+private fun TextFieldsAnadirProd() {
+    val isDropDownExpanded = remember {
+        mutableStateOf(false)
+    }
+
+    Row (verticalAlignment = Alignment.CenterVertically){
+    Column(
+        modifier = Modifier
+            .fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
-    ){
+    ) {
         Text(text = "Nombre del producto")
         Spacer(modifier = Modifier.height(10.dp))
         TextField(value = "Nombre del producto", onValueChange = {})
@@ -187,7 +196,16 @@ private fun TextFieldsAnadirProd(){
         Text(text = "Precio")
         Spacer(modifier = Modifier.height(10.dp))
         TextField(value = "Precio", onValueChange = {})
+
+        Spacer(modifier = Modifier.height(18.dp))
+        Text(text = "Proveedores")
+        IconButton(onClick = {/*Do smthng*/}) {
+            Icon(Icons.Filled.ArrowDropDown, contentDescription = "Desplegar Provedoores")
+
+        }
+
     }
+}
 }
 /*
 @Composable
@@ -195,3 +213,8 @@ fun setSystemBars(){
     val systermUiController = rememberSystemUiController()
 
 }*/
+
+@Composable
+private fun ProveedoresList(){
+
+}
