@@ -46,7 +46,7 @@ import kotlinx.coroutines.launch
             coroutineScope.launch {
                 try {
                     val data = supabaseBillar()
-                        .from("Proveedores")
+                        .from("proveedor")
                         .select()
                         .decodeList<ProveedoresModel>()
                     proveedores.addAll(data)

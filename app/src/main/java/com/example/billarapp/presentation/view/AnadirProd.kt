@@ -8,6 +8,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -23,12 +24,16 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.rounded.ArrowDropDown
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.BottomAppBarDefaults
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
@@ -51,6 +56,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -61,8 +67,9 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.breens.beetablescompose.BeeTablesCompose
 import com.example.billarapp.R
+import com.example.billarapp.domain.ProveedoresModel
 import com.example.billarapp.domain.getProductosFromDataBase
-
+import com.example.billarapp.domain.getProvedoresFromDataBase
 
 
 class AnadirProd : AppCompatActivity() {
@@ -89,7 +96,6 @@ private fun ShowContent(){
 private fun ProductosScreen() {
 
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
-    val context = LocalContext.current
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
@@ -130,14 +136,10 @@ private fun ProductosScreen() {
             BottomAppBar(
                 actions = {
                     //Ese boton debe llamar al menu principal
-                    IconButton(onClick = { /* do something */ }) {
+                    val activity = (LocalContext.current as? Activity)
+                    IconButton(onClick = { activity?.finish() }) {
                         Icon(Icons.Filled.Home, contentDescription = "Localized description")
                     }
-
-                    IconButton(onClick = { /* do something */ }) {
-                        Icon(Icons.Filled.Delete, contentDescription = "Localized description")
-                    }
-
                 },
                 floatingActionButton = {
                     FloatingActionButton(
@@ -180,9 +182,14 @@ private fun ProductosScreen() {
 
 @Composable
 private fun TextFieldsAnadirProd() {
-     val isDropDownExpanded = remember {
+    val proveedores = getProvedoresFromDataBase()
+    val isDropDownExpanded = remember {
         mutableStateOf(false)
     }
+    val itemPosition = remember {
+        mutableStateOf(0)
+    }
+
 
 
     Row (verticalAlignment = Alignment.CenterVertically){
@@ -201,31 +208,61 @@ private fun TextFieldsAnadirProd() {
         Spacer(modifier = Modifier.height(10.dp))
         TextField(value = "Precio", onValueChange = {})
 
+
+        /*Lista de proveedores*/
         Spacer(modifier = Modifier.height(18.dp))
         Text(text = "Proveedores")
-        IconButton(onClick = {/*Do smthng*/}) {
-            Icon(Icons.Filled.ArrowDropDown, contentDescription = "Desplegar Provedoores")
-        }
-        ProveedoresList(
-            expanded = isDropDownExpanded.value,
-            onDismissRequest = {
-                isDropDownExpanded.value = false
+        Row(horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.clickable {
+                isDropDownExpanded.value = true
+            }){
+
+            /*Verifica que haya proveedores existentes*/
+            if (proveedores.isNotEmpty()){
+                Text(text = proveedores[itemPosition.value].nombre)
+            }else{
+                Text(text = "No hay proveedores")
             }
-        ){
+            Icon(Icons.Rounded.ArrowDropDown, contentDescription = "Mostrar proveedores")
+            MenuProv(isDropDownExpanded,proveedores,itemPosition)
         }
 
+
+
+
+
+
+        }
     }
 }
-}
+
+
 
 @Composable
-fun ProveedoresList(expanded: Boolean, onDismissRequest: () -> Unit, content: () -> Unit) {
-
+fun MenuProv(isDropDownExpanded: MutableState<Boolean>,proveedores:MutableList<ProveedoresModel>,itemPosition: MutableState<Int>){
+    DropdownMenu(
+        expanded = isDropDownExpanded.value,
+        onDismissRequest = {
+            isDropDownExpanded.value = false}
+    ) {
+        proveedores.forEachIndexed{
+                index, nombre ->
+            DropdownMenuItem(text = {
+                Text(text = nombre.nombre)
+            },
+                onClick = {
+                    isDropDownExpanded.value = false
+                    itemPosition.value = index
+                }
+            )
+        }
+    }
 }
-/*
-@Composable
-fun setSystemBars(){
-    val systermUiController = rememberSystemUiController()
 
-}*/
+
+
+
+
+
 
