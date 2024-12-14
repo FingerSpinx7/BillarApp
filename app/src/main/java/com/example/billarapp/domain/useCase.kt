@@ -63,12 +63,12 @@ import kotlinx.coroutines.launch
     }
 
 
-suspend fun InsertProducto(proveedor:String, precio:Double, producto:String, stock:Int){
-val datosParaSubir = mapOf(
-        "id_proveedor" to proveedor,
-        "precio" to precio,
-        "det_producto" to producto,
-        "Cantidad_Inv" to stock
+suspend fun InsertProducto(proveedor:Int, precio:Double, producto:String, stock:Int){
+val datosParaSubir = ProductoUpload(
+        id_proveedor = proveedor,
+        precio = precio,
+        det_producto = producto,
+        Cantidad_Inv = stock
     )
     supabaseBillar().from("Productos").insert(datosParaSubir)
 

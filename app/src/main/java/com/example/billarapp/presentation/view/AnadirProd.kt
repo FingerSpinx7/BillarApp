@@ -82,6 +82,8 @@ import com.example.billarapp.domain.InsertProducto
 import com.example.billarapp.domain.ProveedoresModel
 import com.example.billarapp.domain.getProductosFromDataBase
 import com.example.billarapp.domain.getProvedoresFromDataBase
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 
@@ -184,7 +186,8 @@ private fun ProductosScreen() {
 private fun TextFieldsAnadirProd() {
     var preciotmp by remember { mutableStateOf<Double?>(null) }
     preciotmp = precioTodo
-
+    var stocktmp by remember { mutableStateOf<Int?>(null) }
+    stocktmp = stockTodo
 
     Row (verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
@@ -221,7 +224,9 @@ private fun TextFieldsAnadirProd() {
         Spacer(modifier = Modifier.height(18.dp))
         Text(text = "Precio")
         Spacer(modifier = Modifier.height(10.dp))
-        StockTextField()
+        StockTextField(){nuevoStock ->
+            stockTodo = stocktmp as Int
+        }
 
         Spacer(modifier = Modifier.height(30.dp))
         ButtonSubirProducto()
@@ -270,6 +275,8 @@ fun DropdownMenuProveedores() {
         id_proveedorTodo=selectedProveedor.id_proveedor
     }
 }
+
+
 /*Menu que saldra al dar click en proveedores*/
 @Composable
 fun MenuProv(isDropDownExpanded: MutableState<Boolean>,proveedores:MutableList<ProveedoresModel>,itemPosition: MutableState<Int>){
@@ -313,24 +320,24 @@ fun NombreProductoTextField() {
 
 /*Texfield del inventario*/
 @Composable
-fun StockTextField() {
-    val pattern = remember { Regex("^\\d+\$") }
-    var stock by remember{ mutableStateOf(TextFieldValue("")) }
+fun StockTextField(onValueChanged: (Int?) -> Unit) {
+    val pattern = remember { Regex("^\\d*$") } // Solo permite números enteros
+    var stock by remember { mutableStateOf("") }
 
     TextField(
         value = stock,
-        onValueChange = {
-            if (it.text.matches(pattern)|| it.text.isEmpty()) {
-                stock = it
+        onValueChange = { input ->
+            // Validar si el input es válido o está vacío
+            if (pattern.matches(input) || input.isEmpty()) {
+                stock = input
+                onValueChanged(if (input.isNotEmpty()) input.toInt() else null)
             }
         },
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-        label = { Text(text = "Precio") },
-        placeholder = { Text(text = "Precio del producto") },
-        modifier = Modifier
-            .background(Color(0xFFFFFFFF))
+        label = { Text(text = "Cantidad en Inventario") },
+        placeholder = { Text(text = "Ingresa cantidad") },
+        modifier = Modifier.background(Color(0xFFFFFFFF))
     )
-    stockTodo=stock.text.toInt()
 }
 
 
@@ -359,20 +366,35 @@ fun PrecioTextField(onValueChanged: (Double?) -> Unit) {
 
 
 
-/*Botón para subir datos*/
 @Composable
-fun ButtonSubirProducto(){
-    val coroutineScope = rememberCoroutineScope()
-    Row (
-        horizontalArrangement = Arrangement.Center
-    ){
-        ElevatedButton(onClick = { coroutineScope.launch { subirDatosDeProducto() } }) {
-            Text("Añadir")
+fun ButtonSubirProducto() {
+    ElevatedButton(onClick = {
+        // Valida los datos antes de enviarlos
+        if (productoTodo != null && precioTodo != null && productoTodo != null && stockTodo != null) {
+            CoroutineScope(Dispatchers.IO).launch {
+                try {
+                    InsertProducto(
+                        proveedor = id_proveedorTodo, // Reemplaza con el valor real
+                        precio = precioTodo,
+                        producto = productoTodo,
+                        stock = stockTodo
+                    )
+                    println("Producto añadido con éxito")
+                } catch (e: Exception) {
+                    println("Error al subir el producto: ${e.message}")
+                }
+            }
+        } else {
+            println("Por favor, completa todos los datos")
         }
+    }) {
+        Text("Añadir Producto")
     }
 }
 
 
+
+/*
 /*Logica del botón que sube el producto*/
 suspend fun subirDatosDeProducto(){
 
@@ -383,7 +405,7 @@ suspend fun subirDatosDeProducto(){
         println("Faltan datos por completar")
     }
 }
-
+*/
 
 
 
