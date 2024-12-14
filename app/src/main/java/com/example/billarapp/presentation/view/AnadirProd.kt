@@ -43,6 +43,7 @@ import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -76,12 +77,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.lifecycle.ViewModel
 import com.breens.beetablescompose.BeeTablesCompose
 import com.example.billarapp.R
 import com.example.billarapp.domain.InsertProducto
 import com.example.billarapp.domain.ProveedoresModel
 import com.example.billarapp.domain.getProductosFromDataBase
 import com.example.billarapp.domain.getProvedoresFromDataBase
+import com.example.billarapp.presentation.controller.MiViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -98,10 +101,7 @@ class AnadirProd : AppCompatActivity() {
     }
 }
 
-var productoTodo = ""
-var precioTodo = 0.0
-var id_proveedorTodo =0
-var stockTodo =0
+
 
 @Preview(showSystemUi = true)
 @Preview(showBackground = true)
@@ -114,8 +114,8 @@ private fun ShowContent(){
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ProductosScreen() {
-
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
+
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
@@ -132,8 +132,6 @@ private fun ProductosScreen() {
                         overflow = TextOverflow.Ellipsis
                     )
                 },
-
-
 
 
                 navigationIcon = {
@@ -184,52 +182,54 @@ private fun ProductosScreen() {
 
 @Composable
 private fun TextFieldsAnadirProd() {
-    var preciotmp by remember { mutableStateOf<Double?>(null) }
-    preciotmp = precioTodo
-    var stocktmp by remember { mutableStateOf<Int?>(null) }
-    stocktmp = stockTodo
+    val producto = remember { mutableStateOf(TextFieldValue("")) }
+    val precio = remember { mutableStateOf(TextFieldValue("")) }
+    var proveedor by remember { mutableStateOf(0) }
+    val stock = remember{ mutableStateOf(TextFieldValue("")) }
 
     Row (verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
-            .padding(40.dp)){
+            .padding(20.dp)){
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(20.dp),
+            .padding(10.dp),
         horizontalAlignment = Alignment.Start,
         verticalArrangement = Arrangement.Center
 
     ) {
         /*Seccion nombre del producto*/
+        val viewModelProducto: MiViewModel = MiViewModel()
+
         Text(text = "Nombre del producto")
         Spacer(modifier = Modifier.height(10.dp))
-        NombreProductoTextField()
+        NombreProductoTextField(producto)
         Spacer(modifier = Modifier.height(18.dp))
 
         /*Seccion precio del producto*/
 
         Text(text = "Precio")
         Spacer(modifier = Modifier.height(10.dp))
-        PrecioTextField(){nuevoPrecio ->
-            precioTodo= preciotmp as Double
-        }
+        PrecioTextField(precio)
 
         /*Seccion lista de proveedores*/
         Spacer(modifier = Modifier.height(18.dp))
         Text(text = "Proveedores")
-        DropdownMenuProveedores()
+        DropdownMenuProveedores(proveedorDrop = proveedor,
+            onProveedorChanged = {nuevoProveedor ->
+                proveedor =nuevoProveedor
+            })
 
 
         /*Seccion stock*/
         Spacer(modifier = Modifier.height(18.dp))
-        Text(text = "Precio")
+        Text(text = "Inventario")
         Spacer(modifier = Modifier.height(10.dp))
-        StockTextField(){nuevoStock ->
-            stockTodo = stocktmp as Int
-        }
+        StockTextField(stock)
+
 
         Spacer(modifier = Modifier.height(30.dp))
-        ButtonSubirProducto()
+        ButtonSubirProducto(producto,precio,proveedor,stock)
 
 
     }
@@ -240,41 +240,38 @@ private fun TextFieldsAnadirProd() {
 
 /*Dropdown de proveedores*/
 @Composable
-fun DropdownMenuProveedores() {
+fun DropdownMenuProveedores(
+    proveedorDrop: Int,
+    onProveedorChanged: (Int) -> Unit
+) {
     val proveedores = getProvedoresFromDataBase()
-    val isDropDownExpanded = remember {
-        mutableStateOf(false)
-    }
-    val itemPosition = remember {
-        mutableStateOf(0)
-    }
-    val selectedProveedor = if (proveedores.isNotEmpty()) proveedores[itemPosition.value] else null
+    val isDropDownExpanded = remember { mutableStateOf(false) }
+    val itemPosition = remember { mutableStateOf(0) }
 
-
-    Row(horizontalArrangement = Arrangement.Center,
+    Row(
+        horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
-            .clickable {
-                isDropDownExpanded.value = true
-            }
+            .clickable { isDropDownExpanded.value = true }
             .background(Color(0xFFFFFFFF))
             .fillMaxWidth()
             .height(50.dp)
-    ){
-        /*Verifica que haya proveedores existentes*/
-        if (proveedores.isNotEmpty()){
+    ) {
+        if (proveedores.isNotEmpty()) {
             Text(text = proveedores[itemPosition.value].nombre)
-
-        }else{
+        } else {
             Text(text = "No hay proveedores")
         }
         Icon(Icons.Rounded.ArrowDropDown, contentDescription = "Mostrar proveedores")
-        MenuProv(isDropDownExpanded,proveedores,itemPosition)
+        MenuProv(isDropDownExpanded, proveedores, itemPosition)
     }
-    if (selectedProveedor != null) {
-        id_proveedorTodo=selectedProveedor.id_proveedor
+
+    // Notificar el cambio de proveedor seleccionado
+    if (proveedores.isNotEmpty()) {
+        onProveedorChanged(proveedores[itemPosition.value].id_proveedor)
     }
 }
+
 
 
 /*Menu que saldra al dar click en proveedores*/
@@ -302,35 +299,31 @@ fun MenuProv(isDropDownExpanded: MutableState<Boolean>,proveedores:MutableList<P
 
 /*TextField encargada de almacenar el producto*/
 @Composable
-fun NombreProductoTextField() {
-    var producto by remember{ mutableStateOf(TextFieldValue("")) }
-    TextField(
-        value = producto,
-        onValueChange = {
-            producto = it
+fun NombreProductoTextField(producto:MutableState<TextFieldValue>) {
+    OutlinedTextField(
+        value = producto.value,
+        onValueChange = { input->
+            producto.value = input
         },
         leadingIcon = {Icon(Icons.Filled.Edit,"Producto")},
         label = { Text(text = "Producto") },
         placeholder = { Text(text = "Nombre del producto") },
 
     )
-    productoTodo = productoTodo
 }
 
 
 /*Texfield del inventario*/
 @Composable
-fun StockTextField(onValueChanged: (Int?) -> Unit) {
+fun StockTextField(stock: MutableState<TextFieldValue>) {
     val pattern = remember { Regex("^\\d*$") } // Solo permite números enteros
-    var stock by remember { mutableStateOf("") }
 
-    TextField(
-        value = stock,
+    OutlinedTextField(
+        value = stock.value,
         onValueChange = { input ->
             // Validar si el input es válido o está vacío
-            if (pattern.matches(input) || input.isEmpty()) {
-                stock = input
-                onValueChanged(if (input.isNotEmpty()) input.toInt() else null)
+            if (pattern.matches(input.text) || input.text.isEmpty()) {
+                stock.value = input
             }
         },
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
@@ -343,41 +336,39 @@ fun StockTextField(onValueChanged: (Int?) -> Unit) {
 
 /*Textfield del precio*/
 @Composable
-fun PrecioTextField(onValueChanged: (Double?) -> Unit) {
+fun PrecioTextField(precio: MutableState<TextFieldValue>) {
     val pattern = remember { Regex("^\\d*(\\.\\d{0,2})?$") } // Permite hasta 2 decimales
-    var precio by remember { mutableStateOf("") }
 
-    TextField(
-        value = precio,
+    OutlinedTextField(
+        value = precio.value,
         onValueChange = { input ->
             // Validar que cumpla el patrón o que esté vacío
-            if (pattern.matches(input) || input.isEmpty()) {
-                precio = input
-                onValueChanged(if (input.isNotEmpty()) input.toDouble() else null)
+            if (pattern.matches(input.text) || input.text.isEmpty()) {
+                precio.value = input
             }
         },
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-        label = { Text(text = "Cantidad") },
-        placeholder = { Text(text = "Cantidad en inventario") },
-        leadingIcon = { Icon(Icons.Filled.Check, contentDescription = "Precio") },
+        label = { Text(text = "Precio") },
+        placeholder = { Text(text = "Precio") },
+        leadingIcon = { Icon(Icons.Filled.Check, contentDescription = "Precio del producto") },
         modifier = Modifier.background(Color(0xFFFFFFFF))
     )
 }
 
 
-
+/*Boton que sube el producto*/
 @Composable
-fun ButtonSubirProducto() {
+fun ButtonSubirProducto(producto: MutableState<TextFieldValue>, precio: MutableState<TextFieldValue>, proveedor: Int, stock: MutableState<TextFieldValue>) {
     ElevatedButton(onClick = {
         // Valida los datos antes de enviarlos
-        if (productoTodo != null && precioTodo != null && productoTodo != null && stockTodo != null) {
+        if (producto.value.text.isNotEmpty() && precio.value.text.isNotEmpty() && proveedor!=0 && stock.value.text.isNotEmpty()) {
             CoroutineScope(Dispatchers.IO).launch {
                 try {
                     InsertProducto(
-                        proveedor = id_proveedorTodo, // Reemplaza con el valor real
-                        precio = precioTodo,
-                        producto = productoTodo,
-                        stock = stockTodo
+                        proveedor = proveedor, // Reemplaza con el valor real
+                        precio = precio,
+                        producto = producto,
+                        stock = stock
                     )
                     println("Producto añadido con éxito")
                 } catch (e: Exception) {
@@ -406,9 +397,4 @@ suspend fun subirDatosDeProducto(){
     }
 }
 */
-
-
-
-
-
 

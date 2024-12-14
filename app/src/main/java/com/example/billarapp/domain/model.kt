@@ -1,5 +1,9 @@
 package com.example.billarapp.domain
 
+import androidx.compose.runtime.MutableState
+import androidx.compose.ui.text.input.TextFieldValue
+import kotlinx.serialization.Contextual
+
 
 @kotlinx.serialization.Serializable
 data class ProductoModel(
@@ -9,6 +13,7 @@ data class ProductoModel(
     val precio: Double,
     val Cantidad_Inv: Int?=0
 )
+
 
 @kotlinx.serialization.Serializable
 data class ProductoUpload(

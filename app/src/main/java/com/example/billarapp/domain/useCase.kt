@@ -7,8 +7,8 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshots.SnapshotStateList
+import androidx.compose.ui.text.input.TextFieldValue
 import com.example.billarapp.data.network.supabaseBillar
-import com.example.billarapp.presentation.view.productoTodo
 import io.github.jan.supabase.postgrest.from
 import kotlinx.coroutines.launch
 
@@ -63,12 +63,12 @@ import kotlinx.coroutines.launch
     }
 
 
-suspend fun InsertProducto(proveedor:Int, precio:Double, producto:String, stock:Int){
+suspend fun InsertProducto(proveedor:Int, precio:MutableState<TextFieldValue>, producto:MutableState<TextFieldValue>, stock:MutableState<TextFieldValue>){
 val datosParaSubir = ProductoUpload(
         id_proveedor = proveedor,
-        precio = precio,
-        det_producto = producto,
-        Cantidad_Inv = stock
+        precio = precio.value.text.toDoubleOrNull()?:0.0,
+        det_producto = producto.value.text,
+        Cantidad_Inv = stock.value.text.toIntOrNull()?:0
     )
     supabaseBillar().from("Productos").insert(datosParaSubir)
 
