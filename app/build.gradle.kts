@@ -81,5 +81,8 @@ dependencies {
     implementation("com.github.Breens-Mbaka:BeeTablesCompose:1.0.5")
     implementation ("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")
     implementation ("androidx.lifecycle:lifecycle-runtime-compose:2.7.0")
+    // Para kotlinx.serialization
+    implementation ("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
+
 
 }

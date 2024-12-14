@@ -5,7 +5,6 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -21,7 +20,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Phone
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -32,9 +30,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -46,7 +42,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.billarapp.domain.ModeloProveedor
@@ -78,20 +73,32 @@ fun PantallaAgregarProveedor() {
     var mostrarDialogoExito by remember { mutableStateOf(false) }
     var mensajeError by remember { mutableStateOf("") }
     val proveedores = remember { mutableStateListOf<ModeloProveedor>() }
-    val coroutineScope = rememberCoroutineScope() // Correctamente inicializado
+    val coroutineScope = rememberCoroutineScope()
 
-    // Carga inicial de proveedores al iniciar la pantalla
-    LaunchedEffect(Unit) {
-        try {
-            Log.d("ProveedorDebug", "Iniciando carga inicial de proveedores...")
-            val proveedoresDB = fetchProveedoresFromDatabase()
-            proveedores.clear()
-            proveedores.addAll(proveedoresDB)
-            Log.d("ProveedorDebug", "Lista de proveedores actualizada: ${proveedores.size}")
-        } catch (e: Exception) {
-            Log.e("ProveedorDebug", "Error al cargar proveedores: ${e.message}", e)
-            mensajeError = "Error al cargar proveedores: ${e.message}"
+    // Estado para controlar si la lista se está cargando
+    var cargando by remember { mutableStateOf(true) }
+
+    // Lógica de carga inicial como función independiente
+    fun cargarProveedores() {
+        coroutineScope.launch {
+            try {
+                Log.d("ProveedorDebug", "Iniciando carga de proveedores...")
+                val proveedoresDB = fetchProveedoresFromDatabase()
+                proveedores.clear()
+                proveedores.addAll(proveedoresDB)
+                Log.d("ProveedorDebug", "Lista de proveedores cargada: ${proveedores.size}")
+            } catch (e: Exception) {
+                Log.e("ProveedorDebug", "Error al cargar proveedores: ${e.message}", e)
+                mensajeError = "Error al cargar proveedores: ${e.message}"
+            } finally {
+                cargando = false
+            }
         }
+    }
+
+    // Cargar proveedores una vez
+    if (cargando) {
+        cargarProveedores()
     }
 
     Box(
@@ -127,27 +134,7 @@ fun PantallaAgregarProveedor() {
                 )
             }
 
-            // Mensaje de error
-            if (mensajeError.isNotBlank()) {
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 16.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = Color(0xFFFF4444).copy(alpha = 0.1f)
-                    ),
-                    border = BorderStroke(1.dp, Color(0xFFFF4444))
-                ) {
-                    Text(
-                        text = mensajeError,
-                        color = Color(0xFFFF4444),
-                        fontSize = 14.sp,
-                        modifier = Modifier.padding(16.dp)
-                    )
-                }
-            }
-
-            // Formulario
+            // Formulario para añadir proveedores
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -211,7 +198,6 @@ fun PantallaAgregarProveedor() {
                                 return@Button
                             }
 
-                            // Lanzar una corrutina para manejar la función suspendida
                             coroutineScope.launch {
                                 try {
                                     val resultado = agregarProveedorDB(nombreProveedor, numeroTelefono)
@@ -255,7 +241,7 @@ fun PantallaAgregarProveedor() {
                 }
             }
 
-            // Lista de proveedores
+            // Lista de proveedores registrados
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -276,78 +262,38 @@ fun PantallaAgregarProveedor() {
                         modifier = Modifier.padding(bottom = 16.dp)
                     )
 
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .background(Color(0xFF2A2D3B))
-                            .padding(vertical = 12.dp, horizontal = 16.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Text("ID", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 14.sp)
-                        Text("Nombre", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 14.sp)
-                        Text("Teléfono", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 14.sp)
-                    }
-
-                    LazyColumn {
-                        items(proveedores) { proveedor ->
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(8.dp),
-                                horizontalArrangement = Arrangement.SpaceBetween
-                            ) {
-                                Text(text = proveedor.id_proveedor.toString(), color = Color.White)
-                                Text(text = proveedor.nombre, color = Color.White)
-                                Text(text = proveedor.telefono, color = Color.White)
+                    if (cargando) {
+                        Text(
+                            "Cargando proveedores...",
+                            color = Color.White,
+                            fontSize = 16.sp,
+                            modifier = Modifier.padding(vertical = 8.dp)
+                        )
+                    } else if (proveedores.isEmpty()) {
+                        Text(
+                            "No hay proveedores registrados.",
+                            color = Color.White,
+                            fontSize = 16.sp,
+                            modifier = Modifier.padding(vertical = 8.dp)
+                        )
+                    } else {
+                        LazyColumn {
+                            items(proveedores) { proveedor ->
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(8.dp),
+                                    horizontalArrangement = Arrangement.SpaceBetween
+                                ) {
+                                    Text(text = proveedor.id_proveedor.toString(), color = Color.White)
+                                    Text(text = proveedor.nombre, color = Color.White)
+                                    Text(text = proveedor.telefono, color = Color.White)
+                                }
                             }
                         }
                     }
                 }
             }
-        }
-
-        if (mostrarDialogoExito) {
-            AlertDialog(
-                onDismissRequest = { mostrarDialogoExito = false },
-                title = {
-                    Text(
-                        "¡Éxito!",
-                        color = Color.White,
-                        fontWeight = FontWeight.Bold
-                    )
-                },
-                text = {
-                    Text(
-                        "Proveedor añadido correctamente",
-                        color = Color.White
-                    )
-                },
-                confirmButton = {
-                    TextButton(
-                        onClick = { mostrarDialogoExito = false },
-                        colors = ButtonDefaults.textButtonColors(
-                            contentColor = Color(0xFFFFCD6D)
-                        )
-                    ) {
-                        Text("Aceptar")
-                    }
-                },
-                containerColor = Color(0xFF1A1D2B),
-                shape = RoundedCornerShape(16.dp)
-            )
-        }
-    }
-}
-
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-fun PreviewPantallaAgregarProveedor() {
-    MaterialTheme {
-        Surface(
-            modifier = Modifier.fillMaxSize(),
-            color = Color(0xFF0B0E1D)
-        ) {
-            PantallaAgregarProveedor()
         }
     }
 }

@@ -10,6 +10,10 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import com.example.billarapp.data.network.supabaseBillar
 import io.github.jan.supabase.postgrest.postgrest
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.jsonArray
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
 
 @Composable
 fun getProductosFromDataBase(): SnapshotStateList<ProductoModel> {
@@ -36,27 +40,30 @@ fun getProductosFromDataBase(): SnapshotStateList<ProductoModel> {
 
 suspend fun fetchProveedoresFromDatabase(): List<ModeloProveedor> {
     return try {
-        Log.d("ProveedorDebug", "Iniciando carga de proveedores")
-        val data = supabaseBillar()
+        val response = supabaseBillar()
             .postgrest
             .from("proveedor")
             .select()
-            .decodeList<ModeloProveedor>()
-
-        Log.d("ProveedorDebug", "Datos recibidos: $data")
-        data
+        val rawJson = response.data ?: "Respuesta vacía"
+        val jsonArray = Json.parseToJsonElement(rawJson).jsonArray
+        jsonArray.map { jsonElement ->
+            val jsonObject = jsonElement.jsonObject
+            ModeloProveedor(
+                id_proveedor = jsonObject["id_proveedor"]?.jsonPrimitive?.content?.toIntOrNull() ?: 0,
+                nombre = jsonObject["nombre"]?.jsonPrimitive?.content ?: "",
+                telefono = jsonObject["telefono"]?.jsonPrimitive?.content ?: ""
+            )
+        }
     } catch (e: Exception) {
-        Log.e("ProveedorDebug", "Error al cargar proveedores", e)
         emptyList()
     }
 }
 
-// Función de utilidad para insertar proveedores
+
 suspend fun agregarProveedorDB(nombre: String, telefono: String): Boolean {
     return try {
         val clienteSupabase = supabaseBillar()
 
-        // Usar un Map en lugar de un objeto ModeloProveedor
         val proveedor = mapOf(
             "nombre" to nombre.trim(),
             "telefono" to telefono.trim()
