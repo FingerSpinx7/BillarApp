@@ -1,7 +1,6 @@
 package com.example.billarapp.presentation.view
 
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -10,26 +9,32 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Phone
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
@@ -46,6 +51,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.billarapp.domain.ModeloProveedor
 import com.example.billarapp.domain.agregarProveedorDB
+import com.example.billarapp.domain.eliminarProveedor
 import com.example.billarapp.domain.fetchProveedoresFromDatabase
 import kotlinx.coroutines.launch
 
@@ -70,25 +76,23 @@ class AgregarProveedor : ComponentActivity() {
 fun PantallaAgregarProveedor() {
     var nombreProveedor by remember { mutableStateOf("") }
     var numeroTelefono by remember { mutableStateOf("") }
-    var mostrarDialogoExito by remember { mutableStateOf(false) }
     var mensajeError by remember { mutableStateOf("") }
     val proveedores = remember { mutableStateListOf<ModeloProveedor>() }
+    val proveedoresSeleccionados = remember { mutableStateListOf<ModeloProveedor>() }
     val coroutineScope = rememberCoroutineScope()
-
-    // Estado para controlar si la lista se está cargando
     var cargando by remember { mutableStateOf(true) }
+    var modoSeleccion by remember { mutableStateOf(false) }
+    var mostrarDialogoConfirmacion by remember { mutableStateOf(false) }
+    var mostrarDialogoExito by remember { mutableStateOf(false) }
+    var mostrarDialogoEliminar by remember { mutableStateOf(false) }
 
-    // Lógica de carga inicial como función independiente
     fun cargarProveedores() {
         coroutineScope.launch {
             try {
-                Log.d("ProveedorDebug", "Iniciando carga de proveedores...")
                 val proveedoresDB = fetchProveedoresFromDatabase()
                 proveedores.clear()
                 proveedores.addAll(proveedoresDB)
-                Log.d("ProveedorDebug", "Lista de proveedores cargada: ${proveedores.size}")
             } catch (e: Exception) {
-                Log.e("ProveedorDebug", "Error al cargar proveedores: ${e.message}", e)
                 mensajeError = "Error al cargar proveedores: ${e.message}"
             } finally {
                 cargando = false
@@ -96,9 +100,95 @@ fun PantallaAgregarProveedor() {
         }
     }
 
-    // Cargar proveedores una vez
     if (cargando) {
         cargarProveedores()
+    }
+
+    // Diálogo de confirmación para agregar proveedor
+    if (mostrarDialogoConfirmacion) {
+        AlertDialog(
+            onDismissRequest = { mostrarDialogoConfirmacion = false },
+            title = { Text("Confirmar") },
+            text = { Text("¿Deseas agregar este proveedor?") },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        mostrarDialogoConfirmacion = false
+                        coroutineScope.launch {
+                            try {
+                                val resultado = agregarProveedorDB(nombreProveedor, numeroTelefono)
+                                if (resultado) {
+                                    val nuevoProveedor = ModeloProveedor(
+                                        id_proveedor = proveedores.size + 1,
+                                        nombre = nombreProveedor,
+                                        telefono = numeroTelefono
+                                    )
+                                    proveedores.add(nuevoProveedor)
+                                    mostrarDialogoExito = true
+                                    nombreProveedor = ""
+                                    numeroTelefono = ""
+                                }
+                            } catch (e: Exception) {
+                                mensajeError = "Error al agregar proveedor: ${e.message}"
+                            }
+                        }
+                    }
+                ) {
+                    Text("Sí")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { mostrarDialogoConfirmacion = false }) {
+                    Text("No")
+                }
+            }
+        )
+    }
+
+    // Diálogo de éxito
+    if (mostrarDialogoExito) {
+        AlertDialog(
+            onDismissRequest = { mostrarDialogoExito = false },
+            title = { Text("Éxito") },
+            text = { Text("Proveedor agregado con éxito") },
+            confirmButton = {
+                TextButton(onClick = { mostrarDialogoExito = false }) {
+                    Text("OK")
+                }
+            }
+        )
+    }
+
+    // Diálogo de confirmación para eliminar
+    if (mostrarDialogoEliminar) {
+        AlertDialog(
+            onDismissRequest = { mostrarDialogoEliminar = false },
+            title = { Text("Confirmar eliminación") },
+            text = { Text("¿Estás seguro de eliminar ${proveedoresSeleccionados.size} proveedores?") },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        coroutineScope.launch {
+                            proveedoresSeleccionados.forEach { proveedor ->
+                                val resultado = eliminarProveedor(proveedor)
+                                if (resultado) {
+                                    proveedores.remove(proveedor)
+                                }
+                            }
+                            proveedoresSeleccionados.clear()
+                        }
+                        mostrarDialogoEliminar = false
+                    }
+                ) {
+                    Text("Sí")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { mostrarDialogoEliminar = false }) {
+                    Text("No")
+                }
+            }
+        )
     }
 
     Box(
@@ -134,7 +224,7 @@ fun PantallaAgregarProveedor() {
                 )
             }
 
-            // Formulario para añadir proveedores
+            // Formulario
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -197,30 +287,7 @@ fun PantallaAgregarProveedor() {
                                 mensajeError = "Todos los campos son obligatorios."
                                 return@Button
                             }
-
-                            coroutineScope.launch {
-                                try {
-                                    val resultado = agregarProveedorDB(nombreProveedor, numeroTelefono)
-
-                                    if (resultado) {
-                                        val nuevoProveedor = ModeloProveedor(
-                                            id_proveedor = proveedores.size + 1,
-                                            nombre = nombreProveedor,
-                                            telefono = numeroTelefono
-                                        )
-                                        proveedores.add(nuevoProveedor)
-                                        mostrarDialogoExito = true
-                                        mensajeError = ""
-                                        nombreProveedor = ""
-                                        numeroTelefono = ""
-                                    } else {
-                                        mensajeError = "Error al añadir proveedor"
-                                    }
-                                } catch (e: Exception) {
-                                    Log.e("ProveedorError", "Error completo: ", e)
-                                    mensajeError = "Error al añadir proveedor: ${e.message}"
-                                }
-                            }
+                            mostrarDialogoConfirmacion = true
                         },
                         modifier = Modifier
                             .fillMaxWidth()
@@ -241,7 +308,82 @@ fun PantallaAgregarProveedor() {
                 }
             }
 
-            // Lista de proveedores registrados
+            // Botones de selección
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Button(
+                    onClick = { modoSeleccion = !modoSeleccion },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFFFFCD6D)
+                    ),
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(56.dp),
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Text(
+                        "Selección",
+                        color = Color(0xFF0B0E1D),
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+
+                if (modoSeleccion) {
+                    Button(
+                        onClick = {
+                            if (proveedoresSeleccionados.size == proveedores.size) {
+                                proveedoresSeleccionados.clear()
+                            } else {
+                                proveedoresSeleccionados.clear()
+                                proveedoresSeleccionados.addAll(proveedores)
+                            }
+                        },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFFFFCD6D)
+                        ),
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(56.dp),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Text(
+                            "Seleccionar todos",
+                            color = Color(0xFF0B0E1D),
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+
+                    Button(
+                        onClick = {
+                            if (proveedoresSeleccionados.isNotEmpty()) {
+                                mostrarDialogoEliminar = true
+                            }
+                        },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFFFFCD6D)
+                        ),
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(56.dp),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Text(
+                            "Eliminar seleccionados",
+                            color = Color(0xFF0B0E1D),
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                }
+            }
+
+            // Lista de proveedores
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -261,6 +403,19 @@ fun PantallaAgregarProveedor() {
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier.padding(bottom = 16.dp)
                     )
+
+                    // Encabezados de la tabla
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        if (modoSeleccion) {
+                            Spacer(modifier = Modifier.width(32.dp))
+                        }
+                        Text("ID", color = Color.White, fontWeight = FontWeight.Bold)
+                        Text("NOMBRE", color = Color.White, fontWeight = FontWeight.Bold)
+                        Text("TELÉFONO", color = Color.White, fontWeight = FontWeight.Bold)
+                    }
 
                     if (cargando) {
                         Text(
@@ -282,9 +437,26 @@ fun PantallaAgregarProveedor() {
                                 Row(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .padding(8.dp),
-                                    horizontalArrangement = Arrangement.SpaceBetween
+                                        .padding(vertical = 8.dp),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
                                 ) {
+                                    if (modoSeleccion) {
+                                        Checkbox(
+                                            checked = proveedoresSeleccionados.contains(proveedor),
+                                            onCheckedChange = { isChecked ->
+                                                if (isChecked) {
+                                                    proveedoresSeleccionados.add(proveedor)
+                                                } else {
+                                                    proveedoresSeleccionados.remove(proveedor)
+                                                }
+                                            },
+                                            colors = CheckboxDefaults.colors(
+                                                checkedColor = Color(0xFFFFCD6D),
+                                                uncheckedColor = Color.White
+                                            )
+                                        )
+                                    }
                                     Text(text = proveedor.id_proveedor.toString(), color = Color.White)
                                     Text(text = proveedor.nombre, color = Color.White)
                                     Text(text = proveedor.telefono, color = Color.White)

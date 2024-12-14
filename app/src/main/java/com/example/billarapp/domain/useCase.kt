@@ -84,3 +84,18 @@ suspend fun agregarProveedorDB(nombre: String, telefono: String): Boolean {
         false
     }
 }
+
+suspend fun eliminarProveedor(proveedor: ModeloProveedor): Boolean {
+    return try {
+        val clienteSupabase = supabaseBillar()
+        clienteSupabase.postgrest
+            .from("proveedor")
+            .delete {
+                "id_proveedor" to proveedor.id_proveedor
+            }
+        true
+    } catch (e: Exception) {
+        Log.e("ErrorEliminarProveedor", "Error detallado: ", e)
+        false
+    }
+}
