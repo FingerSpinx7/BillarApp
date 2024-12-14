@@ -68,7 +68,6 @@ suspend fun agregarProveedorDB(nombre: String, telefono: String): Boolean {
             "nombre" to nombre.trim(),
             "telefono" to telefono.trim()
         )
-
         Log.d("ProveedorDebug", "Enviando proveedor: $proveedor")
 
         clienteSupabase
@@ -88,14 +87,17 @@ suspend fun agregarProveedorDB(nombre: String, telefono: String): Boolean {
 suspend fun eliminarProveedor(proveedor: ModeloProveedor): Boolean {
     return try {
         val clienteSupabase = supabaseBillar()
-        clienteSupabase.postgrest
-            .from("proveedor")
+        val response = clienteSupabase.postgrest
+            .from(table = "proveedor")
             .delete {
-                "id_proveedor" to proveedor.id_proveedor
+                filter {
+                    eq(column = "id_proveedor", proveedor.id_proveedor)
+                }
             }
-        true
+        response.data != null // Si la respuesta tiene datos, la operación fue exitosa
     } catch (e: Exception) {
-        Log.e("ErrorEliminarProveedor", "Error detallado: ", e)
+        Log.e("ErrorEliminarProveedor", "Error detallado: ${e.message}")
         false
     }
 }
+

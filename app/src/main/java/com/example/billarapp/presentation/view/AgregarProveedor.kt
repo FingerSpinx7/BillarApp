@@ -85,7 +85,6 @@ fun PantallaAgregarProveedor() {
     var mostrarDialogoConfirmacion by remember { mutableStateOf(false) }
     var mostrarDialogoExito by remember { mutableStateOf(false) }
     var mostrarDialogoEliminar by remember { mutableStateOf(false) }
-
     fun cargarProveedores() {
         coroutineScope.launch {
             try {
@@ -308,13 +307,16 @@ fun PantallaAgregarProveedor() {
                 }
             }
 
-            // Botones de selección
+            var textoSeleccionar by remember { mutableStateOf("Seleccionar todos") }
+
+// Botones de selección
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = 16.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
+                // Botón para habilitar/deshabilitar el modo selección
                 Button(
                     onClick = { modoSeleccion = !modoSeleccion },
                     colors = ButtonDefaults.buttonColors(
@@ -322,7 +324,7 @@ fun PantallaAgregarProveedor() {
                     ),
                     modifier = Modifier
                         .weight(1f)
-                        .height(56.dp),
+                        .height(44.dp),
                     shape = RoundedCornerShape(12.dp)
                 ) {
                     Text(
@@ -333,14 +335,19 @@ fun PantallaAgregarProveedor() {
                     )
                 }
 
+                // Botón de seleccionar/deseleccionar todos
                 if (modoSeleccion) {
                     Button(
                         onClick = {
                             if (proveedoresSeleccionados.size == proveedores.size) {
+                                // Deseleccionar todos
                                 proveedoresSeleccionados.clear()
+                                textoSeleccionar = "Seleccionar todos"
                             } else {
+                                // Seleccionar todos
                                 proveedoresSeleccionados.clear()
                                 proveedoresSeleccionados.addAll(proveedores)
+                                textoSeleccionar = "Deseleccionar todos"
                             }
                         },
                         colors = ButtonDefaults.buttonColors(
@@ -352,13 +359,14 @@ fun PantallaAgregarProveedor() {
                         shape = RoundedCornerShape(12.dp)
                     ) {
                         Text(
-                            "Seleccionar todos",
+                            textoSeleccionar,
                             color = Color(0xFF0B0E1D),
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Bold
                         )
                     }
 
+                    // Botón de eliminar seleccionados
                     Button(
                         onClick = {
                             if (proveedoresSeleccionados.isNotEmpty()) {
@@ -382,6 +390,7 @@ fun PantallaAgregarProveedor() {
                     }
                 }
             }
+
 
             // Lista de proveedores
             Card(
