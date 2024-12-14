@@ -13,6 +13,7 @@ import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.postgrest
 import io.github.jan.supabase.postgrest.query.Columns
 import kotlinx.coroutines.launch
+import kotlinx.serialization.Serializable
 
 class pruebas : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -59,7 +60,7 @@ class pruebas : AppCompatActivity() {
     }
 } 
 
-@kotlinx.serialization.Serializable
+@Serializable
 data class TablaPruebas(
     val id: Int = 0,
     val nombre: String =""

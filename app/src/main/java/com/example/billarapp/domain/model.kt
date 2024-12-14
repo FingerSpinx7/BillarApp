@@ -9,3 +9,13 @@ data class ProductoModel(
     val precio: Float,
     val Cantidad_Inv: Int?=0
 )
+
+@kotlinx.serialization.Serializable
+data class ModeloProveedor(
+    @kotlinx.serialization.SerialName("id_proveedor")
+    val id_proveedor: Int = 0,
+    @kotlinx.serialization.SerialName("nombre")
+    val nombre: String,
+    @kotlinx.serialization.SerialName("telefono")
+    val telefono: String
+)

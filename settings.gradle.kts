@@ -9,6 +9,7 @@ pluginManagement {
         }
         mavenCentral()
         gradlePluginPortal()
+
     }
 }
 dependencyResolutionManagement {
@@ -22,4 +23,3 @@ dependencyResolutionManagement {
 
 rootProject.name = "BillarApp"
 include(":app")
- 
