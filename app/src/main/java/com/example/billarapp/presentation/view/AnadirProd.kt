@@ -28,6 +28,7 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.rounded.ArrowDropDown
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.BottomAppBarDefaults
 import androidx.compose.material3.Button
@@ -46,6 +47,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldColors
 import androidx.compose.material3.TopAppBar
@@ -75,6 +77,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.ViewModel
@@ -359,42 +362,114 @@ fun PrecioTextField(precio: MutableState<TextFieldValue>) {
 /*Boton que sube el producto*/
 @Composable
 fun ButtonSubirProducto(producto: MutableState<TextFieldValue>, precio: MutableState<TextFieldValue>, proveedor: Int, stock: MutableState<TextFieldValue>) {
+    var mostrarDialogoConfirmacion by remember { mutableStateOf(false) }
+    var mostrarDialogoExito by remember { mutableStateOf(false) }
+    var mostrarDialogoFaltanCampos by remember { mutableStateOf(false) }
+    var mensajeDialogoExito by remember { mutableStateOf("") }
+
     ElevatedButton(onClick = {
         // Valida los datos antes de enviarlos
-        if (producto.value.text.isNotEmpty() && precio.value.text.isNotEmpty() && proveedor!=0 && stock.value.text.isNotEmpty()) {
-            CoroutineScope(Dispatchers.IO).launch {
-                try {
-                    InsertProducto(
-                        proveedor = proveedor, // Reemplaza con el valor real
-                        precio = precio,
-                        producto = producto,
-                        stock = stock
-                    )
-                    println("Producto añadido con éxito")
-                } catch (e: Exception) {
-                    println("Error al subir el producto: ${e.message}")
-                }
-            }
+        if (producto.value.text.isNotBlank() && precio.value.text.isNotBlank() && proveedor!=0 && stock.value.text.isNotBlank()) {
+            mostrarDialogoConfirmacion = true
+
         } else {
-            println("Por favor, completa todos los datos")
+            mostrarDialogoFaltanCampos= true
         }
     }) {
         Text("Añadir Producto")
     }
-}
 
+    if(mostrarDialogoConfirmacion){
+        MostrarDialogoConfirmacion(
+            producto = producto.value.text,
+            onConfirmar = {
+                mostrarDialogoConfirmacion = false
+                CoroutineScope(Dispatchers.IO).launch {
+                    try {
+                        InsertProducto(
+                            proveedor = proveedor,
+                            precio = precio,
+                            producto = producto,
+                            stock = stock
+                        )
+                        mensajeDialogoExito = "Producto añadido con exito"
+                    }catch (e:Exception){
+                        mensajeDialogoExito = "Error al subir el producto: ${e.message}"
+                    }
+                    mostrarDialogoExito = true
+                }
+            },
+            onCancelar = {mostrarDialogoConfirmacion=false}
+        )
+    }
+    if (mostrarDialogoExito){
+        MostarDialogoExito(
+            mensaje = mensajeDialogoExito,
+            onDismiss = {mostrarDialogoExito = false}
+        )
+    }
 
-
-/*
-/*Logica del botón que sube el producto*/
-suspend fun subirDatosDeProducto(){
-
-    // Lógica para validar datos y subirlos
-    if (productoTodo!=null&& precioTodo!=null&& productoTodo!=null&& stockTodo!=null) {
-        InsertProducto(productoTodo, precioTodo, productoTodo, stockTodo)
-    } else {
-        println("Faltan datos por completar")
+    if(mostrarDialogoFaltanCampos){
+        MostrarDialogoFaltanCampos { mostrarDialogoFaltanCampos = false }
     }
 }
-*/
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun MostrarDialogoConfirmacion(
+    producto: String,
+    onConfirmar: ()->Unit,
+    onCancelar:()->Unit
+){
+
+    AlertDialog(
+        onDismissRequest = {onCancelar()},
+        title = { Text("Confirmar") },
+        text = { Text("¿Deseas agregar el producto $producto a la lista?") },
+        confirmButton = {
+            TextButton(onClick = {onConfirmar()}) {
+                Text("Si")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = {onCancelar()}) {
+                Text("Cancelar")
+            }
+        }
+    )
+}
+
+@Composable
+fun MostrarDialogoFaltanCampos(onDismiss: ()->Unit){
+    AlertDialog(
+        onDismissRequest = {onDismiss()},
+        title = { Text("Error") },
+        text = {Text("Por favor, completa todos los campos antes de continuar")},
+        confirmButton = {
+            TextButton(onClick = {onDismiss()}) {
+                Text("Aceptar")
+            }
+        }
+    )
+}
+
+@Composable
+fun MostarDialogoExito(mensaje: String, onDismiss: () -> Unit){
+    AlertDialog(
+        onDismissRequest = {onDismiss()},
+        title = {Text("Resultado")},
+        text = { Text(mensaje) },
+        confirmButton = {
+            TextButton(onClick = {onDismiss()}) {
+                Text("Aceptar")
+            }
+        }
+    )
+}
+
+
+
+
+
+
 
