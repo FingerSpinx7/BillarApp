@@ -215,7 +215,7 @@ fun PantallaAgregarProveedor() {
                     text = "Añadir Proveedor",
                     fontSize = 32.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color(0xFFFFCD6D),
+                    color = Color(0xff7FD238),
                     modifier = Modifier
                         .padding(24.dp)
                         .fillMaxWidth(),
@@ -244,7 +244,7 @@ fun PantallaAgregarProveedor() {
                             .fillMaxWidth()
                             .padding(bottom = 16.dp),
                         colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = Color(0xFFFFCD6D),
+                            focusedBorderColor = Color(0xff99df5b),
                             unfocusedBorderColor = Color(0xFFB2B6C1),
                             focusedTextColor = Color.White,
                             unfocusedTextColor = Color.White
@@ -253,7 +253,7 @@ fun PantallaAgregarProveedor() {
                             Icon(
                                 Icons.Default.Person,
                                 contentDescription = "Persona",
-                                tint = Color(0xFFFFCD6D)
+                                tint = Color(0xff99df5b)
                             )
                         },
                         shape = RoundedCornerShape(12.dp)
@@ -265,7 +265,7 @@ fun PantallaAgregarProveedor() {
                         label = { Text("Teléfono", color = Color.White) },
                         modifier = Modifier.fillMaxWidth(),
                         colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = Color(0xFFFFCD6D),
+                            focusedBorderColor = Color(0xff99df5b),
                             unfocusedBorderColor = Color(0xFFB2B6C1),
                             focusedTextColor = Color.White,
                             unfocusedTextColor = Color.White
@@ -274,7 +274,7 @@ fun PantallaAgregarProveedor() {
                             Icon(
                                 Icons.Default.Phone,
                                 contentDescription = "Teléfono",
-                                tint = Color(0xFFFFCD6D)
+                                tint = Color(0xff99df5b)
                             )
                         },
                         shape = RoundedCornerShape(12.dp)
@@ -293,7 +293,7 @@ fun PantallaAgregarProveedor() {
                             .height(56.dp)
                             .padding(top = 16.dp),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFFFFCD6D)
+                            containerColor = Color(0xff99df5b)
                         ),
                         shape = RoundedCornerShape(12.dp)
                     ) {
@@ -320,11 +320,11 @@ fun PantallaAgregarProveedor() {
                 Button(
                     onClick = { modoSeleccion = !modoSeleccion },
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFFFFCD6D)
+                        containerColor = Color(0xff99df5b)
                     ),
                     modifier = Modifier
                         .weight(1f)
-                        .height(44.dp),
+                        .height(37.dp),
                     shape = RoundedCornerShape(12.dp)
                 ) {
                     Text(
@@ -351,7 +351,7 @@ fun PantallaAgregarProveedor() {
                             }
                         },
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFFFFCD6D)
+                            containerColor = Color(0xff7FD238)
                         ),
                         modifier = Modifier
                             .weight(1f)
@@ -374,7 +374,7 @@ fun PantallaAgregarProveedor() {
                             }
                         },
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFFFFCD6D)
+                            containerColor = Color(0xff7FD238)
                         ),
                         modifier = Modifier
                             .weight(1f)
@@ -407,7 +407,7 @@ fun PantallaAgregarProveedor() {
                 ) {
                     Text(
                         "Proveedores Registrados",
-                        color = Color(0xFFFFCD6D),
+                        color = Color(0xff7FD238),
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier.padding(bottom = 16.dp)
@@ -461,7 +461,7 @@ fun PantallaAgregarProveedor() {
                                                 }
                                             },
                                             colors = CheckboxDefaults.colors(
-                                                checkedColor = Color(0xFFFFCD6D),
+                                                checkedColor = Color(0xff7FD238),
                                                 uncheckedColor = Color.White
                                             )
                                         )
