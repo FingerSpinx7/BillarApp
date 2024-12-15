@@ -1,6 +1,7 @@
 package com.example.billarapp.presentation.view
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.graphics.drawable.Icon
 import android.os.Bundle
@@ -135,8 +136,6 @@ private fun ProductosScreen() {
                         overflow = TextOverflow.Ellipsis
                     )
                 },
-
-
                 navigationIcon = {
                     val activity = (LocalContext.current as? Activity)
                     IconButton(onClick = {
@@ -151,8 +150,6 @@ private fun ProductosScreen() {
                 scrollBehavior = scrollBehavior,
             )
         },
-
-
         bottomBar = {
             BottomAppBar(
                 actions = {
@@ -173,8 +170,6 @@ private fun ProductosScreen() {
             ) {
                 Spacer(modifier = Modifier.height(16.dp))
                 TextFieldsAnadirProd()
-
-
             }
         }
     )
@@ -240,7 +235,6 @@ private fun TextFieldsAnadirProd() {
 }
 
 
-
 /*Dropdown de proveedores*/
 @Composable
 fun DropdownMenuProveedores(
@@ -274,7 +268,6 @@ fun DropdownMenuProveedores(
         onProveedorChanged(proveedores[itemPosition.value].id_proveedor)
     }
 }
-
 
 
 /*Menu que saldra al dar click en proveedores*/
@@ -366,6 +359,8 @@ fun ButtonSubirProducto(producto: MutableState<TextFieldValue>, precio: MutableS
     var mostrarDialogoExito by remember { mutableStateOf(false) }
     var mostrarDialogoFaltanCampos by remember { mutableStateOf(false) }
     var mensajeDialogoExito by remember { mutableStateOf("") }
+    val context = LocalContext.current
+
 
     ElevatedButton(onClick = {
         // Valida los datos antes de enviarlos
@@ -405,7 +400,8 @@ fun ButtonSubirProducto(producto: MutableState<TextFieldValue>, precio: MutableS
     if (mostrarDialogoExito){
         MostarDialogoExito(
             mensaje = mensajeDialogoExito,
-            onDismiss = {mostrarDialogoExito = false}
+            onDismiss = {mostrarDialogoExito = false},
+            context = context
         )
     }
 
@@ -413,6 +409,7 @@ fun ButtonSubirProducto(producto: MutableState<TextFieldValue>, precio: MutableS
         MostrarDialogoFaltanCampos { mostrarDialogoFaltanCampos = false }
     }
 }
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -439,6 +436,7 @@ fun MostrarDialogoConfirmacion(
     )
 }
 
+
 @Composable
 fun MostrarDialogoFaltanCampos(onDismiss: ()->Unit){
     AlertDialog(
@@ -453,14 +451,20 @@ fun MostrarDialogoFaltanCampos(onDismiss: ()->Unit){
     )
 }
 
+
 @Composable
-fun MostarDialogoExito(mensaje: String, onDismiss: () -> Unit){
+fun MostarDialogoExito(mensaje: String, onDismiss: () -> Unit, context: Context){
     AlertDialog(
         onDismissRequest = {onDismiss()},
         title = {Text("Resultado")},
         text = { Text(mensaje) },
         confirmButton = {
-            TextButton(onClick = {onDismiss()}) {
+            TextButton(onClick = {
+                onDismiss()
+                //Nav to Productos
+                val intent = Intent (context,Productos::class.java)
+                context.startActivity(intent)
+            }) {
                 Text("Aceptar")
             }
         }
