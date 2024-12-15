@@ -34,6 +34,7 @@ import com.breens.beetablescompose.BeeTablesCompose
 import com.example.billarapp.data.network.supabaseBillar
 import com.example.billarapp.domain.ProductoModel
 import com.example.billarapp.domain.getProductosFromDataBase
+import com.example.billarapp.ui.theme.SystemBarsColorChanger
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.postgrest.from
 import kotlinx.coroutines.launch
@@ -45,8 +46,21 @@ class Productos : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        setContent {
-            ShowContent()
+        setContent{
+
+            MaterialTheme{
+                SystemBarsColorChanger(
+                    statusBarColor = Color.Black,
+                    navigationBarColor = Color.Black,
+                    isLightIcons = true
+                )
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = Color(0xFF0B0E1D)
+                ){
+                    ShowContent()
+                }
+            }
         }
 
     }

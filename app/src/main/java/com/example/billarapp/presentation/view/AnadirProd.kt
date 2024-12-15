@@ -47,6 +47,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
@@ -89,6 +90,7 @@ import com.example.billarapp.domain.ProveedoresModel
 import com.example.billarapp.domain.getProductosFromDataBase
 import com.example.billarapp.domain.getProvedoresFromDataBase
 import com.example.billarapp.presentation.controller.MiViewModel
+import com.example.billarapp.ui.theme.SystemBarsColorChanger
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -98,9 +100,21 @@ class AnadirProd : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-
         setContent{
-            ShowContent()
+
+            MaterialTheme{
+                SystemBarsColorChanger(
+                    statusBarColor = Color.Black,
+                    navigationBarColor = Color.Black,
+                    isLightIcons = true
+                )
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = Color(0xFF0B0E1D)
+                ){
+                    ShowContent()
+                }
+            }
         }
     }
 }
@@ -121,13 +135,17 @@ private fun ProductosScreen() {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
 
     Scaffold(
-        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+        modifier = Modifier
+            .nestedScroll(scrollBehavior.nestedScrollConnection)
+            .fillMaxSize()
+            .background(Color(0xFF0BE1D))
+        ,
         topBar = {
             CenterAlignedTopAppBar(
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = (Color(0xFFB7BABC)),
-                    titleContentColor = Color(0xFF0B0E1D),
-                    navigationIconContentColor = Color(0xFF0B0E1D)
+                    containerColor = (Color(0xFF006847)),
+                    titleContentColor = Color(0xFFFFFFFF),
+                    navigationIconContentColor = Color(0xFFFFFFFF)
                 ),
                 title = {
                     Text(
@@ -159,6 +177,7 @@ private fun ProductosScreen() {
                         Icon(Icons.Filled.Home, contentDescription = "Localized description")
                     }
                 },
+
             )
         },
         content = { innerPadding ->
