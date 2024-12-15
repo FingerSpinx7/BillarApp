@@ -7,10 +7,15 @@ import kotlinx.serialization.Contextual
 
 @kotlinx.serialization.Serializable
 data class ProductoModel(
+    @kotlinx.serialization.SerialName("id_producto")
     val id_producto: Int,
+    @kotlinx.serialization.SerialName("id_proveedor")
     val id_proveedor: Int,
+    @kotlinx.serialization.SerialName("det_producto")
     val det_producto: String,
+    @kotlinx.serialization.SerialName("precio")
     val precio: Double,
+    @kotlinx.serialization.SerialName("Cantidad_Inv")
     val Cantidad_Inv: Int?=0
 )
 

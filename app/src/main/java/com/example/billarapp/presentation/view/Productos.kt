@@ -12,10 +12,12 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material3.*
@@ -23,6 +25,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Paint
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -82,22 +86,41 @@ private fun ShowContent(){
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ProductosScreen() {
-    val productos = getProductosFromDataBase()
+    val productos = remember { mutableStateListOf<ProductoModel>() }
     val context = LocalContext.current
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
+    var cargando by remember { mutableStateOf(true) }
+    val coroutineScope = rememberCoroutineScope()
+    var mensajeError by remember { mutableStateOf("") }
+
+    fun cargarProductos() {
+        coroutineScope.launch {
+            try {
+                val productoDB = getProductosFromDataBase()
+                productos.clear()
+                productos.addAll(productoDB)
+            } catch (e: Exception) {
+                mensajeError = "Error al cargar proveedores: ${e.message}"
+            } finally {
+                cargando = false
+            }
+        }
+    }
+
+    if (cargando) {
+        cargarProductos()
+    }
 
 
-
-    val tableHeaders = listOf("Id prod.", "Id prov.", "Producto", "Precio", "Stock")
 
     Scaffold(
         //TopBar de la pantalla, incluyendo colores definidos, boton de regresar y titulo
         topBar = {
             TopAppBar(
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = Color(0xFFFFCD6D),
-                    titleContentColor = Color(0xFF0B0E1D),
-                    navigationIconContentColor = Color(0xFF0B0E1D)
+                    containerColor = Color(0xFF1A1D2B),
+                    titleContentColor = Color(0xFFffffff),
+                    navigationIconContentColor = Color(0xFFFFFFFF)
                 ),
                 title = {
                     Text(
@@ -110,8 +133,10 @@ private fun ProductosScreen() {
 
                 navigationIcon = {
                     /*CORREGIR CLASE LLAMADA EN LA IMPLEMENTACION DE LAS DEMAS PANTALLAS*/
-                    IconButton(onClick = {val intent = Intent(context, Productos::class.java)
-                        context.startActivity(intent)}) {
+                    IconButton(onClick = {
+                        val intent = Intent(context, Productos::class.java)
+                        context.startActivity(intent)
+                    }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Back"
@@ -124,6 +149,8 @@ private fun ProductosScreen() {
 
         bottomBar = {
             BottomAppBar(
+                containerColor = Color(0xFF1A1D2B),
+                contentColor = Color(0xFFFFFFFF),
                 actions = {
                     //Ese boton debe llamar al menu principal
                     IconButton(onClick = { /* do something */ }) {
@@ -137,49 +164,234 @@ private fun ProductosScreen() {
                 },
                 floatingActionButton = {
                     FloatingActionButton(
-                        onClick = { val intent = Intent(context, AnadirProd::class.java)
-                            context.startActivity(intent) },
+                        onClick = {
+                            val intent = Intent(context, AnadirProd::class.java)
+                            context.startActivity(intent)
+                        },
                         containerColor = BottomAppBarDefaults.bottomAppBarFabColor,
                         elevation = FloatingActionButtonDefaults.bottomAppBarFabElevation(),
 
-                    ) {
+                        ) {
                         Icon(Icons.Filled.Add, "Add products")
                     }
 
                 },
 
-            )
+                )
         },
         content = { innerPadding ->
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(Color(0xFFB7BABC))
+                    .background(Color(0xFF0B0E1D))
                     .padding(innerPadding)
-                    .padding(horizontal = 30.dp)
+                    .padding(18.dp)
             ) {
-                Spacer(modifier = Modifier.height(16.dp))
-                Text(
-                    text = "Productos",
-                    fontSize = 40.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color(0xFF0B0E1D),
-                    modifier = Modifier.align(Alignment.CenterHorizontally)
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    text = "Lista de productos",
-                    fontSize = 30.sp,
-                    color = Color(0xFF4A4D5D),
-                    modifier = Modifier.align(Alignment.CenterHorizontally)
-                )
-                Spacer(modifier = Modifier.height(16.dp))
+                var modoSeleccion by remember { mutableStateOf(false) }
+                var textoSeleccionar by remember { mutableStateOf("Seleccionar todos") }
+                val productosSeleccionados = remember { mutableStateListOf<ProductoModel>() }
+                var mostrarDialogoEliminar by remember { mutableStateOf(false) }
 
-                BeeTablesCompose(data = productos, headerTableTitles = tableHeaders)
+
+
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    // Botón para habilitar/deshabilitar el modo selección
+                    Button(
+                        onClick = { modoSeleccion = !modoSeleccion },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xff99df5b)
+                        ),
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(37.dp),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        if(!modoSeleccion){
+                            Text(
+                                "Seleccionar",
+                                color = Color(0xFF0B0E1D),
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }else{
+                            Icon(
+                                imageVector =Icons.Default.Close,
+                                contentDescription = "Cerrar modo selección",
+                                tint = Color(0xFF0B0E1D)
+                            )
+                        }
+                    }
+
+                    // Botón de seleccionar/deseleccionar todos
+                    if (modoSeleccion) {
+                        Button(
+                            onClick = {
+                                if (productosSeleccionados.size == productos.size) {
+                                    // Deseleccionar todos
+                                    productosSeleccionados.clear()
+                                    textoSeleccionar = "Seleccionar todos"
+                                } else {
+                                    // Seleccionar todos
+                                    productosSeleccionados.clear()
+                                    productosSeleccionados.addAll(productos)
+                                    textoSeleccionar = "Deseleccionar todos"
+                                }
+                            },
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(0xff7FD238)
+                            ),
+                            modifier = Modifier
+                                .weight(1f)
+                                .height(56.dp),
+                            shape = RoundedCornerShape(12.dp)
+                        ) {
+                            Text(
+                                textoSeleccionar,
+                                color = Color(0xFF0B0E1D),
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+
+                        // Botón de eliminar seleccionados
+                        Button(
+                            onClick = {
+                                if (productosSeleccionados.isNotEmpty()) {
+                                    mostrarDialogoEliminar = true
+                                }
+                            },
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(0xff7FD238)
+                            ),
+                            modifier = Modifier
+                                .weight(1f)
+                                .height(56.dp),
+                            shape = RoundedCornerShape(12.dp)
+                        ) {
+                            Text(
+                                "Eliminar seleccionados",
+                                color = Color(0xFF0B0E1D),
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                    }
+                }
+
+
+                // Lista de productos
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f),
+                    colors = CardDefaults.cardColors(
+                        containerColor = Color(0xFF1A1D2B)
+                    ),
+                    shape = RoundedCornerShape(16.dp)
+                ) {
+                    Column(
+                        modifier = Modifier.padding(16.dp)
+                    ) {
+                        Text(
+                            "Productos Registrados",
+                            color = Color(0xff7FD238),
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(bottom = 16.dp)
+                        )
+
+                        // Encabezados de la tabla
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            if (modoSeleccion) {
+                                Spacer(modifier = Modifier.width(32.dp))
+                            }
+                            Text("ID", color = Color.White, fontWeight = FontWeight.Bold)
+                            Text("# PROV", color = Color.White, fontWeight = FontWeight.Bold)
+                            Text("PRODUCTO", color = Color.White, fontWeight = FontWeight.Bold)
+                            Text("$", color = Color.White, fontWeight = FontWeight.Bold)
+                            Text("Cant.", color = Color.White, fontWeight = FontWeight.Bold)
+
+                        }
+
+                        if (cargando) {
+                            Text(
+                                "Cargando productos...",
+                                color = Color.White,
+                                fontSize = 16.sp,
+                                modifier = Modifier.padding(vertical = 8.dp)
+                            )
+                        } else if (productos.isEmpty()) {
+                            Text(
+                                "No hay proveedores registrados.",
+                                color = Color.White,
+                                fontSize = 16.sp,
+                                modifier = Modifier.padding(vertical = 8.dp)
+                            )
+                        } else {
+                            LazyColumn {
+                                items(productos) { producto ->
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(vertical = 8.dp),
+                                        horizontalArrangement = Arrangement.SpaceBetween,
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        if (modoSeleccion) {
+                                            Checkbox(
+                                                checked = productosSeleccionados.contains(producto),
+                                                onCheckedChange = { isChecked ->
+                                                    if (isChecked) {
+                                                        productosSeleccionados.add(producto)
+                                                    } else {
+                                                        productosSeleccionados.remove(producto)
+                                                    }
+                                                },
+                                                colors = CheckboxDefaults.colors(
+                                                    checkedColor = Color(0xff7FD238),
+                                                    uncheckedColor = Color.White
+                                                )
+                                            )
+                                        }
+                                        Text(
+                                            text = producto.id_producto.toString(),
+                                            color = Color.White
+                                        )
+                                        Text(
+                                            text = producto.id_proveedor.toString(),
+                                            color = Color.White
+                                        )
+                                        Text(text = producto.det_producto, color = Color.White)
+                                        Text(text = producto.precio.toString(), color = Color.White)
+                                        Text(
+                                            text = producto.Cantidad_Inv.toString(),
+                                            color = Color.White
+                                        )
+
+                                    }
+
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
     )
 }
+
+
+
+
 
 
 

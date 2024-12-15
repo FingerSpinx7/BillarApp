@@ -10,33 +10,39 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.text.input.TextFieldValue
 import com.example.billarapp.data.network.supabaseBillar
 import io.github.jan.supabase.postgrest.from
+import io.github.jan.supabase.postgrest.postgrest
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.jsonArray
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
 
 
+suspend fun getProductosFromDataBase(): List<ProductoModel>{
+        return  try {
+            val response = supabaseBillar()
+                .postgrest
+                .from("Productos")
+                .select ()
+            val rawJson = response.data?:"Respuesta vacia"
+            val jsonArray = Json.parseToJsonElement(rawJson).jsonArray
+            jsonArray.map{jsonElement ->
+                val jsonObject=jsonElement.jsonObject
+                ProductoModel(
+                    id_producto = jsonObject["id_producto"]?.jsonPrimitive?.content?.toIntOrNull()?:0,
+                    id_proveedor = jsonObject["id_proveedor"]?.jsonPrimitive?.content?.toIntOrNull()?:0,
+                    det_producto = jsonObject["det_producto"]?.jsonPrimitive?.content ?: "",
+                    precio = jsonObject["precio"]?.jsonPrimitive?.content?.toDoubleOrNull()?:0.0,
+                    Cantidad_Inv = jsonObject["Cantidad_Inv"]?.jsonPrimitive?.content?.toIntOrNull()?:0,
+                )
 
-
-
-    @Composable
-    fun getProductosFromDataBase(): SnapshotStateList<ProductoModel> {
-        val productos = remember { mutableStateListOf<ProductoModel>() }
-        val coroutineScope = rememberCoroutineScope()
-
-        LaunchedEffect(Unit) {
-            coroutineScope.launch {
-                try {
-                    val data = supabaseBillar()
-                        .from("Productos")
-                        .select()
-                        .decodeList<ProductoModel>()
-                    productos.addAll(data)
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                    Log.e("dbg", "Error: ${e.message}")
-                }
             }
+        }catch (e: Exception){
+            emptyList()
+
         }
 
-        return productos
     }
 
     @Composable
