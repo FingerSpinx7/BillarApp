@@ -37,6 +37,7 @@ import androidx.compose.ui.unit.sp
 import com.breens.beetablescompose.BeeTablesCompose
 import com.example.billarapp.data.network.supabaseBillar
 import com.example.billarapp.domain.ProductoModel
+import com.example.billarapp.domain.eliminarProducto
 import com.example.billarapp.domain.getProductosFromDataBase
 import com.example.billarapp.ui.theme.SystemBarsColorChanger
 import io.github.jan.supabase.SupabaseClient
@@ -92,6 +93,11 @@ private fun ProductosScreen() {
     var cargando by remember { mutableStateOf(true) }
     val coroutineScope = rememberCoroutineScope()
     var mensajeError by remember { mutableStateOf("") }
+    var mostrarDialogoConfirmacion by remember { mutableStateOf(false) }
+    var mostrarDialogoExito by remember { mutableStateOf(false) }
+    var mostrarDialogoEliminar by remember { mutableStateOf(false) }
+    val productosSeleccionados = remember { mutableStateListOf<ProductoModel>() }
+
 
     fun cargarProductos() {
         coroutineScope.launch {
@@ -110,6 +116,57 @@ private fun ProductosScreen() {
     if (cargando) {
         cargarProductos()
     }
+
+    // Diálogo de confirmación para eliminar
+    if (mostrarDialogoEliminar) {
+        AlertDialog(
+            onDismissRequest = { mostrarDialogoEliminar = false },
+            title = { Text("Confirmar eliminación") },
+            text = { Text("¿Estás seguro de eliminar ${productosSeleccionados.size} producto(s)?") },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        coroutineScope.launch {
+                            productosSeleccionados.forEach { producto ->
+                                val resultado = eliminarProducto(producto)
+                                if (resultado) {
+                                    productos.remove(producto)
+                                }
+                            }
+                            productosSeleccionados.clear()
+                        }
+                        mostrarDialogoEliminar = false
+                        mostrarDialogoExito = true
+                    }
+                ) {
+                    Text("Sí")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { mostrarDialogoEliminar = false }) {
+                    Text("No")
+                }
+            }
+        )
+    }
+
+    if (mostrarDialogoExito) {
+        AlertDialog(
+            onDismissRequest = { mostrarDialogoExito = false },
+            title = { Text("Productos eliminados") },
+            text = { Text("Los productos seleccionados han sido eliminados exitosamente.") },
+            confirmButton = {
+                TextButton(onClick = { mostrarDialogoExito = false }) {
+                    Text("Aceptar")
+                }
+            }
+        )
+    }
+
+
+
+
+
 
 
 

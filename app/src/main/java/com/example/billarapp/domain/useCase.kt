@@ -77,6 +77,22 @@ val datosParaSubir = ProductoUpload(
         Cantidad_Inv = stock.value.text.toIntOrNull()?:0
     )
     supabaseBillar().from("Productos").insert(datosParaSubir)
-
-
 }
+
+suspend fun eliminarProducto(producto:ProductoModel):Boolean{
+    return try {
+        val clienteSupabase = supabaseBillar()
+        val response = clienteSupabase.postgrest
+            .from(table = "Productos")
+            .delete{
+                filter {
+                    eq(column = "id_producto",producto.id_producto)
+                }
+            }
+        response.data!=null
+    }catch (e:Exception){
+        Log.e("ErrorEliminarProducto", "Error: ${e.message}")
+        false
+    }
+}
+
