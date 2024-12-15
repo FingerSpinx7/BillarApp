@@ -1,11 +1,9 @@
 package com.example.billarapp.presentation.view
 
-import android.R.style.Theme
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.compose.setContent
-import androidx.activity.ComponentActivity
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.background
@@ -16,8 +14,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material3.*
@@ -25,25 +21,18 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Paint
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.breens.beetablescompose.BeeTablesCompose
-import com.example.billarapp.data.network.supabaseBillar
 import com.example.billarapp.domain.ProductoModel
 import com.example.billarapp.domain.eliminarProducto
 import com.example.billarapp.domain.getProductosFromDataBase
 import com.example.billarapp.ui.theme.SystemBarsColorChanger
-import io.github.jan.supabase.SupabaseClient
-import io.github.jan.supabase.postgrest.from
+
 import kotlinx.coroutines.launch
-import kotlinx.serialization.Serializable
 
 class Productos : AppCompatActivity() {
 
@@ -83,7 +72,6 @@ private fun ShowContent(){
     ProductosScreen()
 }
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ProductosScreen() {
@@ -93,11 +81,6 @@ private fun ProductosScreen() {
     var cargando by remember { mutableStateOf(true) }
     val coroutineScope = rememberCoroutineScope()
     var mensajeError by remember { mutableStateOf("") }
-    var mostrarDialogoConfirmacion by remember { mutableStateOf(false) }
-    var mostrarDialogoExito by remember { mutableStateOf(false) }
-    var mostrarDialogoEliminar by remember { mutableStateOf(false) }
-    val productosSeleccionados = remember { mutableStateListOf<ProductoModel>() }
-
 
     fun cargarProductos() {
         coroutineScope.launch {
@@ -116,59 +99,6 @@ private fun ProductosScreen() {
     if (cargando) {
         cargarProductos()
     }
-
-    // Diálogo de confirmación para eliminar
-    if (mostrarDialogoEliminar) {
-        AlertDialog(
-            onDismissRequest = { mostrarDialogoEliminar = false },
-            title = { Text("Confirmar eliminación") },
-            text = { Text("¿Estás seguro de eliminar ${productosSeleccionados.size} producto(s)?") },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        coroutineScope.launch {
-                            productosSeleccionados.forEach { producto ->
-                                val resultado = eliminarProducto(producto)
-                                if (resultado) {
-                                    productos.remove(producto)
-                                }
-                            }
-                            productosSeleccionados.clear()
-                        }
-                        mostrarDialogoEliminar = false
-                        mostrarDialogoExito = true
-                    }
-                ) {
-                    Text("Sí")
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { mostrarDialogoEliminar = false }) {
-                    Text("No")
-                }
-            }
-        )
-    }
-
-    if (mostrarDialogoExito) {
-        AlertDialog(
-            onDismissRequest = { mostrarDialogoExito = false },
-            title = { Text("Productos eliminados") },
-            text = { Text("Los productos seleccionados han sido eliminados exitosamente.") },
-            confirmButton = {
-                TextButton(onClick = { mostrarDialogoExito = false }) {
-                    Text("Aceptar")
-                }
-            }
-        )
-    }
-
-
-
-
-
-
-
 
     Scaffold(
         //TopBar de la pantalla, incluyendo colores definidos, boton de regresar y titulo
@@ -248,7 +178,53 @@ private fun ProductosScreen() {
                 var textoSeleccionar by remember { mutableStateOf("Seleccionar todos") }
                 val productosSeleccionados = remember { mutableStateListOf<ProductoModel>() }
                 var mostrarDialogoEliminar by remember { mutableStateOf(false) }
+                var mostrarDialogoExito by remember { mutableStateOf(false) }
 
+                // Diálogo de confirmación para eliminar
+                if (mostrarDialogoEliminar) {
+                    AlertDialog(
+                        onDismissRequest = { mostrarDialogoEliminar = false },
+                        title = { Text("Confirmar eliminación") },
+                        text = { Text("¿Estás seguro de eliminar ${productosSeleccionados.size} producto(s)?") },
+                        confirmButton = {
+                            TextButton(
+                                onClick = {
+                                    coroutineScope.launch {
+                                        productosSeleccionados.forEach { producto ->
+                                            val resultado = eliminarProducto(producto)
+                                            if (resultado) {
+                                                productos.remove(producto)
+                                            }
+                                        }
+                                        productosSeleccionados.clear()
+                                    }
+                                    mostrarDialogoEliminar = false
+                                    mostrarDialogoExito = true
+                                }
+                            ) {
+                                Text("Sí")
+                            }
+                        },
+                        dismissButton = {
+                            TextButton(onClick = { mostrarDialogoEliminar = false }) {
+                                Text("No")
+                            }
+                        }
+                    )
+                }
+
+                if (mostrarDialogoExito) {
+                    AlertDialog(
+                        onDismissRequest = { mostrarDialogoExito = false },
+                        title = { Text("Productos eliminados") },
+                        text = { Text("Los productos seleccionados han sido eliminados exitosamente.") },
+                        confirmButton = {
+                            TextButton(onClick = { mostrarDialogoExito = false }) {
+                                Text("Aceptar")
+                            }
+                        }
+                    )
+                }
 
 
 
@@ -278,7 +254,7 @@ private fun ProductosScreen() {
                             )
                         }else{
                             Icon(
-                                imageVector =Icons.Default.Close,
+                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                                 contentDescription = "Cerrar modo selección",
                                 tint = Color(0xFF0B0E1D)
                             )
@@ -320,6 +296,7 @@ private fun ProductosScreen() {
                         Button(
                             onClick = {
                                 if (productosSeleccionados.isNotEmpty()) {
+                                    Log.i("dbg","Productos ${productosSeleccionados.size}")
                                     mostrarDialogoEliminar = true
                                 }
                             },
