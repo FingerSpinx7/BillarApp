@@ -9,6 +9,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -18,16 +19,20 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.rounded.AccountCircle
 import androidx.compose.material.icons.rounded.ArrowDropDown
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.BottomAppBar
@@ -46,6 +51,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -66,6 +72,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -138,12 +145,12 @@ private fun ProductosScreen() {
         modifier = Modifier
             .nestedScroll(scrollBehavior.nestedScrollConnection)
             .fillMaxSize()
-            .background(Color(0xFF0BE1D))
+            .background(Color(0xFF0B0E1D))
         ,
         topBar = {
             CenterAlignedTopAppBar(
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = (Color(0xFF006847)),
+                    containerColor = (Color(0xFF1A1D2B)),
                     titleContentColor = Color(0xFFFFFFFF),
                     navigationIconContentColor = Color(0xFFFFFFFF)
                 ),
@@ -177,6 +184,8 @@ private fun ProductosScreen() {
                         Icon(Icons.Filled.Home, contentDescription = "Localized description")
                     }
                 },
+                containerColor = Color(0xFF1A1D2B),
+                contentColor = Color.White
 
             )
         },
@@ -184,10 +193,11 @@ private fun ProductosScreen() {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(Color(0xFFFFCD6D))
+                    .background(Color(0xFF0B0E1D))
                     .padding(innerPadding)
+                    .padding(top = 10.dp)
+                    .padding(horizontal = 20.dp)
             ) {
-                Spacer(modifier = Modifier.height(16.dp))
                 TextFieldsAnadirProd()
             }
         }
@@ -206,7 +216,7 @@ private fun TextFieldsAnadirProd() {
 
     Row (verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
-            .padding(20.dp)){
+            ){
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -218,20 +228,20 @@ private fun TextFieldsAnadirProd() {
         /*Seccion nombre del producto*/
         val viewModelProducto: MiViewModel = MiViewModel()
 
-        Text(text = "Nombre del producto")
+        Text(text = "Nombre del producto", color = Color.White)
         Spacer(modifier = Modifier.height(10.dp))
         NombreProductoTextField(producto)
         Spacer(modifier = Modifier.height(18.dp))
 
         /*Seccion precio del producto*/
 
-        Text(text = "Precio")
+        Text(text = "Precio", color = Color.White)
         Spacer(modifier = Modifier.height(10.dp))
         PrecioTextField(precio)
 
         /*Seccion lista de proveedores*/
         Spacer(modifier = Modifier.height(18.dp))
-        Text(text = "Proveedores")
+        Text(text = "Proveedores", color = Color.White)
         DropdownMenuProveedores(proveedorDrop = proveedor,
             onProveedorChanged = {nuevoProveedor ->
                 proveedor =nuevoProveedor
@@ -240,7 +250,7 @@ private fun TextFieldsAnadirProd() {
 
         /*Seccion stock*/
         Spacer(modifier = Modifier.height(18.dp))
-        Text(text = "Inventario")
+        Text(text = "Inventario", color = Color.White)
         Spacer(modifier = Modifier.height(10.dp))
         StockTextField(stock)
 
@@ -265,22 +275,64 @@ fun DropdownMenuProveedores(
     val itemPosition = remember { mutableStateOf(0) }
 
     Row(
-        horizontalArrangement = Arrangement.Center,
+
+        horizontalArrangement = Arrangement.Start,
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .clickable { isDropDownExpanded.value = true }
-            .background(Color(0xFFFFFFFF))
+            .background(Color(0xFF0B0E1D))
             .fillMaxWidth()
             .height(50.dp)
-    ) {
-        if (proveedores.isNotEmpty()) {
-            Text(text = proveedores[itemPosition.value].nombre)
-        } else {
-            Text(text = "No hay proveedores")
+            .clip(RoundedCornerShape(12.dp))
+            .border(
+                width = 2.dp,
+                color = Color(0xFFB2B6C1),
+                shape = RoundedCornerShape(12.dp)
+
+            )
+            .padding(start =12.dp)
+    ) {if (proveedores.isNotEmpty()) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            Icon(
+                Icons.Rounded.AccountCircle, // Ícono de ejemplo
+                contentDescription = "Proveedor",
+                tint = Color(0xFF99DF5B),
+                modifier = Modifier.size(30.dp).padding(end = 8.dp) // Tamaño del ícono y espaciado
+            )
+            Text(
+                text = proveedores[itemPosition.value].nombre,
+                color = Color.White
+            )
         }
-        Icon(Icons.Rounded.ArrowDropDown, contentDescription = "Mostrar proveedores")
-        MenuProv(isDropDownExpanded, proveedores, itemPosition)
+    } else {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            Icon(
+                Icons.Rounded.AccountCircle, // Ícono para "No hay proveedores"
+                contentDescription = "Advertencia",
+                tint = Color.White,
+                modifier = Modifier
+                    .size(20.dp)
+                    .padding(end = 8.dp)
+            )
+            Text(
+                text = "No hay proveedores",
+                color = Color.White
+            )
+        }
     }
+    Icon(
+        Icons.Rounded.ArrowDropDown,
+        contentDescription = "Mostrar proveedores",
+        tint = Color.White
+    )
+    MenuProv(isDropDownExpanded, proveedores, itemPosition)
+}
 
     // Notificar el cambio de proveedor seleccionado
     if (proveedores.isNotEmpty()) {
@@ -320,9 +372,21 @@ fun NombreProductoTextField(producto:MutableState<TextFieldValue>) {
         onValueChange = { input->
             producto.value = input
         },
-        leadingIcon = {Icon(Icons.Filled.Edit,"Producto")},
-        label = { Text(text = "Producto") },
+        leadingIcon = {
+            Icon(
+                Icons.Filled.Edit,
+                "Producto",
+                tint = Color(0xFF99DF5B)
+            )},
+        label = { Text(text = "Producto", color = Color.White) },
         placeholder = { Text(text = "Nombre del producto") },
+        shape = RoundedCornerShape(12.dp),
+        colors = OutlinedTextFieldDefaults.colors(
+            focusedBorderColor = Color(0xff99df5b),
+            unfocusedBorderColor = Color(0xFFB2B6C1),
+            focusedTextColor = Color.White,
+            unfocusedTextColor = Color.White
+        )
 
     )
 }
@@ -342,9 +406,22 @@ fun StockTextField(stock: MutableState<TextFieldValue>) {
             }
         },
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-        label = { Text(text = "Cantidad en Inventario") },
+        label = { Text("Cantidad en Inventario", color = Color.White) },
         placeholder = { Text(text = "Ingresa cantidad") },
-        modifier = Modifier.background(Color(0xFFFFFFFF))
+        shape = RoundedCornerShape(12.dp),
+                colors = OutlinedTextFieldDefaults.colors(
+            focusedBorderColor = Color(0xff99df5b),
+            unfocusedBorderColor = Color(0xFFB2B6C1),
+            focusedTextColor = Color.White,
+            unfocusedTextColor = Color.White
+        ),
+        leadingIcon = {
+            Icon(
+                Icons.Default.AddCircle,
+                contentDescription = "Inventario",
+                tint = Color(0xFF99DF5B)
+            )
+        }
     )
 }
 
@@ -363,10 +440,21 @@ fun PrecioTextField(precio: MutableState<TextFieldValue>) {
             }
         },
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-        label = { Text(text = "Precio") },
+        label = { Text(text = "Precio", color =  Color.White) },
         placeholder = { Text(text = "Precio") },
-        leadingIcon = { Icon(Icons.Filled.Check, contentDescription = "Precio del producto") },
-        modifier = Modifier.background(Color(0xFFFFFFFF))
+        shape = RoundedCornerShape(12.dp),
+        leadingIcon = {
+            Icon(
+                Icons.Filled.Check,
+                contentDescription = "Precio del producto",
+                tint = Color(0xFF99DF5B)
+            ) },
+        colors = OutlinedTextFieldDefaults.colors(
+            focusedBorderColor = Color(0xff99df5b),
+            unfocusedBorderColor = Color(0xFFB2B6C1),
+            focusedTextColor = Color.White,
+            unfocusedTextColor = Color.White
+        )
     )
 }
 
@@ -389,8 +477,14 @@ fun ButtonSubirProducto(producto: MutableState<TextFieldValue>, precio: MutableS
         } else {
             mostrarDialogoFaltanCampos= true
         }
-    }) {
-        Text("Añadir Producto")
+    },
+        colors = ButtonDefaults
+            .buttonColors(
+                containerColor = Color(0xFF99DF5B)
+            )
+
+        ) {
+        Text("Añadir Producto", color = Color.Black)
     }
 
     if(mostrarDialogoConfirmacion){
@@ -455,7 +549,7 @@ fun MostrarDialogoConfirmacion(
     )
 }
 
-
+//Dialogo Faltan campos por llenar
 @Composable
 fun MostrarDialogoFaltanCampos(onDismiss: ()->Unit){
     AlertDialog(
@@ -470,7 +564,7 @@ fun MostrarDialogoFaltanCampos(onDismiss: ()->Unit){
     )
 }
 
-
+//Dialogo Datos subidos exitosamente
 @Composable
 fun MostarDialogoExito(mensaje: String, onDismiss: () -> Unit, context: Context){
     AlertDialog(

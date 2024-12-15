@@ -15,6 +15,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -144,10 +145,6 @@ private fun ProductosScreen() {
                         Icon(Icons.Filled.Home, contentDescription = "Localized description")
                     }
 
-                    IconButton(onClick = { /* do something */ }) {
-                        Icon(Icons.Filled.Delete, contentDescription = "Localized description")
-                    }
-
                 },
                 floatingActionButton = {
                     FloatingActionButton(
@@ -175,7 +172,7 @@ private fun ProductosScreen() {
                     .padding(18.dp)
             ) {
                 var modoSeleccion by remember { mutableStateOf(false) }
-                var textoSeleccionar by remember { mutableStateOf("Seleccionar todos") }
+                var textoSeleccionar by remember { mutableStateOf("Todos") }
                 val productosSeleccionados = remember { mutableStateListOf<ProductoModel>() }
                 var mostrarDialogoEliminar by remember { mutableStateOf(false) }
                 var mostrarDialogoExito by remember { mutableStateOf(false) }
@@ -246,8 +243,23 @@ private fun ProductosScreen() {
                         shape = RoundedCornerShape(12.dp)
                     ) {
                         if(!modoSeleccion){
+                            Row{
+                                Icon(
+                                    imageVector = Icons.Filled.Edit,
+                                    contentDescription = "Editar",
+                                    tint = Color(0xFF0B0E1D),
+                                    modifier = Modifier
+                                        .padding(end = 5.dp)
+                                )
+                                Text(
+                                    "Editar",
+                                    color = Color(0xFF0B0E1D),
+                                    fontSize = 16.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
                             Text(
-                                "Seleccionar",
+                                "",
                                 color = Color(0xFF0B0E1D),
                                 fontSize = 16.sp,
                                 fontWeight = FontWeight.Bold
@@ -263,17 +275,70 @@ private fun ProductosScreen() {
 
                     // Botón de seleccionar/deseleccionar todos
                     if (modoSeleccion) {
+                        if(productosSeleccionados.size!=1){
+                            Button(
+                                onClick = {               /*Cambiar actividad a Editar producto*/
+
+                                },
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = Color(0xFFB2B6C1),
+                                    contentColor = Color.White
+                                ),
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .height(56.dp),
+                                shape = RoundedCornerShape(12.dp)
+
+                            ) {
+                                Row{
+                                    Icon(
+                                        imageVector = Icons.Filled.Edit,
+                                        contentDescription = "Editar",
+                                        modifier = Modifier
+                                            .padding(end = 5.dp)
+                                    )
+                                }
+                            }
+                        }else{Button(
+                            onClick = {               /*Cambiar actividad a Editar producto*/
+                                val intent = Intent(context, AnadirProd::class.java)
+                                context.startActivity(intent)
+                            },
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(0xff7FD238),
+                                contentColor = Color.Black
+                            ),
+                            modifier = Modifier
+                                .weight(1f)
+                                .height(56.dp),
+                            shape = RoundedCornerShape(12.dp)
+
+                        ) {
+                            Row{
+                                Icon(
+                                    imageVector = Icons.Filled.Edit,
+                                    contentDescription = "Editar",
+                                    modifier = Modifier
+                                        .padding(end = 5.dp)
+                                )
+                            }
+                        }
+
+                        }
+
+
+
                         Button(
                             onClick = {
                                 if (productosSeleccionados.size == productos.size) {
                                     // Deseleccionar todos
                                     productosSeleccionados.clear()
-                                    textoSeleccionar = "Seleccionar todos"
+                                    textoSeleccionar = "Todos"
                                 } else {
                                     // Seleccionar todos
                                     productosSeleccionados.clear()
                                     productosSeleccionados.addAll(productos)
-                                    textoSeleccionar = "Deseleccionar todos"
+                                    textoSeleccionar = "Limpiar selecc."
                                 }
                             },
                             colors = ButtonDefaults.buttonColors(
@@ -308,11 +373,10 @@ private fun ProductosScreen() {
                                 .height(56.dp),
                             shape = RoundedCornerShape(12.dp)
                         ) {
-                            Text(
-                                "Eliminar seleccionados",
-                                color = Color(0xFF0B0E1D),
-                                fontSize = 16.sp,
-                                fontWeight = FontWeight.Bold
+                            Icon(
+                                imageVector = Icons.Filled.Delete,
+                                contentDescription = "Cerrar modo selección",
+                                tint = Color(0xFF0B0E1D)
                             )
                         }
                     }
@@ -323,7 +387,8 @@ private fun ProductosScreen() {
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .weight(1f),
+                        .weight(1f)
+                        .padding(12.dp),
                     colors = CardDefaults.cardColors(
                         containerColor = Color(0xFF1A1D2B)
                     ),
