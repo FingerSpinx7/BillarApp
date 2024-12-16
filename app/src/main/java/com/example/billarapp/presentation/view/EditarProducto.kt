@@ -60,6 +60,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextOverflow
@@ -339,9 +340,11 @@ private fun MenuProv(isDropDownExpanded: MutableState<Boolean>, proveedores:Muta
 /*TextField encargada de almacenar el producto*/
 @Composable
 private fun NombreProductoTextField(producto_default:ProductoModel,producto_ingresado:MutableState<TextFieldValue>) {
-    if (producto_ingresado.value.text.isEmpty()) {
+    var inicializado by remember { mutableStateOf(false) }
+    // Inicializa el valor de precio_ingresado con el precio por defecto si está vacío
+    if (!inicializado) {
         producto_ingresado.value = TextFieldValue(producto_default.det_producto)
-    }
+        inicializado = true    }
 
     OutlinedTextField(
         value = producto_ingresado.value,
@@ -366,10 +369,11 @@ private fun NombreProductoTextField(producto_default:ProductoModel,producto_ingr
 @Composable
 private fun StockTextField(producto_default: ProductoModel,stockRecibido:MutableState<TextFieldValue>) {
     val pattern = remember { Regex("^\\d*$") } // Solo permite números enteros
+    var inicializado by remember { mutableStateOf(false) }
     // Inicializa el valor de precio_ingresado con el precio por defecto si está vacío
-    if (stockRecibido.value.text.isEmpty()) {
+    if (!inicializado) {
         stockRecibido.value = TextFieldValue(producto_default.Cantidad_Inv.toString())
-    }
+        inicializado = true    }
 
     OutlinedTextField(
         value = stockRecibido.value,
@@ -404,10 +408,11 @@ private fun StockTextField(producto_default: ProductoModel,stockRecibido:Mutable
 @Composable
 private fun PrecioTextField(producto_default: ProductoModel,precio_ingresado:MutableState<TextFieldValue>) {
     val pattern = remember { Regex("^\\d*(\\.\\d{0,2})?$") } // Permite hasta 2 decimales
+    var inicializado by remember { mutableStateOf(false) }
     // Inicializa el valor de precio_ingresado con el precio por defecto si está vacío
-    if (precio_ingresado.value.text.isEmpty()) {
+    if (!inicializado) {
         precio_ingresado.value = TextFieldValue(producto_default.precio.toString())
-    }
+        inicializado = true    }
 
     OutlinedTextField(
         value = precio_ingresado.value,
