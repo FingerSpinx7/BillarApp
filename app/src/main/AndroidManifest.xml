@@ -15,6 +15,9 @@
         android:theme="@style/Theme.BillarApp"
         tools:targetApi="31">
         <activity
+            android:name=".presentation.view.EditarProducto"
+            android:exported="false" />
+        <activity
             android:name=".presentation.view.AnadirProd"
             android:exported="false" />
         <activity

@@ -19,6 +19,8 @@ import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 
 
+
+
 suspend fun getProductosFromDataBase(): List<ProductoModel>{
         return  try {
             val response = supabaseBillar()
@@ -68,6 +70,27 @@ suspend fun getProductosFromDataBase(): List<ProductoModel>{
         return proveedores
     }
 
+suspend fun EditProd(id_producto:Int,proveedor:Int, precio:MutableState<TextFieldValue>, producto:MutableState<TextFieldValue>, stock:MutableState<TextFieldValue>){
+    val datosParaEditar = ProductoModel(
+        id_producto=id_producto,
+        id_proveedor = proveedor,
+        precio = precio.value.text.toDoubleOrNull()?:0.0,
+        det_producto = producto.value.text,
+        Cantidad_Inv = stock.value.text.toIntOrNull()?:0
+    )
+    supabaseBillar().from("Productos").update(
+        {
+            set("det_producto",datosParaEditar.det_producto)
+            set("precio",datosParaEditar.precio)
+            set("Cantidad_Inv",datosParaEditar.Cantidad_Inv)
+            set("id_proveedor",datosParaEditar.id_proveedor)
+        }
+    ){
+        filter {
+            eq("id_producto",datosParaEditar.id_producto)
+        }
+    }
+}
 
 suspend fun InsertProducto(proveedor:Int, precio:MutableState<TextFieldValue>, producto:MutableState<TextFieldValue>, stock:MutableState<TextFieldValue>){
 val datosParaSubir = ProductoUpload(

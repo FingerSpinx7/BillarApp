@@ -273,61 +273,9 @@ private fun ProductosScreen() {
                         }
                     }
 
-                    // Botón de seleccionar/deseleccionar todos
                     if (modoSeleccion) {
-                        if(productosSeleccionados.size!=1){
-                            Button(
-                                onClick = {               /*Cambiar actividad a Editar producto*/
 
-                                },
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = Color(0xFFB2B6C1),
-                                    contentColor = Color.White
-                                ),
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .height(56.dp),
-                                shape = RoundedCornerShape(12.dp)
-
-                            ) {
-                                Row{
-                                    Icon(
-                                        imageVector = Icons.Filled.Edit,
-                                        contentDescription = "Editar",
-                                        modifier = Modifier
-                                            .padding(end = 5.dp)
-                                    )
-                                }
-                            }
-                        }else{Button(
-                            onClick = {               /*Cambiar actividad a Editar producto*/
-                                val intent = Intent(context, AnadirProd::class.java)
-                                context.startActivity(intent)
-                            },
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = Color(0xff7FD238),
-                                contentColor = Color.Black
-                            ),
-                            modifier = Modifier
-                                .weight(1f)
-                                .height(56.dp),
-                            shape = RoundedCornerShape(12.dp)
-
-                        ) {
-                            Row{
-                                Icon(
-                                    imageVector = Icons.Filled.Edit,
-                                    contentDescription = "Editar",
-                                    modifier = Modifier
-                                        .padding(end = 5.dp)
-                                )
-                            }
-                        }
-
-                        }
-
-
-
+                        // Botón de seleccionar/deseleccionar todos
                         Button(
                             onClick = {
                                 if (productosSeleccionados.size == productos.size) {
@@ -355,6 +303,57 @@ private fun ProductosScreen() {
                                 fontSize = 16.sp,
                                 fontWeight = FontWeight.Bold
                             )
+                        }
+                        //Boton editar
+                        if(productosSeleccionados.size!=1){
+                            Button(
+                                onClick = {/*nohacenada*/},
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = Color(0xFFB2B6C1),
+                                    contentColor = Color.White
+                                ),
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .height(56.dp),
+                                shape = RoundedCornerShape(12.dp)
+
+                            ) {
+                                Row{
+                                    Icon(
+                                        imageVector = Icons.Filled.Edit,
+                                        contentDescription = "Editar",
+                                        modifier = Modifier
+                                            .padding(end = 5.dp)
+                                    )
+                                }
+                            }
+                        }else{Button(
+                            onClick = {               /*Cambiar actividad a Editar producto*/
+                                val intent = Intent(context, EditarProducto::class.java).apply {
+                                    putExtra("producto",productosSeleccionados.first())
+                                }
+                                context.startActivity(intent)
+                            },
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(0xff7FD238),
+                                contentColor = Color.Black
+                            ),
+                            modifier = Modifier
+                                .weight(1f)
+                                .height(56.dp),
+                            shape = RoundedCornerShape(12.dp)
+
+                        ) {
+                            Row{
+                                Icon(
+                                    imageVector = Icons.Filled.Edit,
+                                    contentDescription = "Editar",
+                                    modifier = Modifier
+                                        .padding(end = 5.dp)
+                                )
+                            }
+                        }
+
                         }
 
                         // Botón de eliminar seleccionados

@@ -1,10 +1,12 @@
 package com.example.billarapp.domain
 
+import android.os.Parcelable
 import androidx.compose.runtime.MutableState
 import androidx.compose.ui.text.input.TextFieldValue
+import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.Contextual
 
-
+@Parcelize
 @kotlinx.serialization.Serializable
 data class ProductoModel(
     @kotlinx.serialization.SerialName("id_producto")
@@ -17,7 +19,7 @@ data class ProductoModel(
     val precio: Double,
     @kotlinx.serialization.SerialName("Cantidad_Inv")
     val Cantidad_Inv: Int?=0
-)
+):Parcelable
 
 
 @kotlinx.serialization.Serializable
