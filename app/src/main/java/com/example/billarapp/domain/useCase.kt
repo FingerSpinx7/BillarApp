@@ -9,6 +9,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.text.input.TextFieldValue
 import com.example.billarapp.data.network.supabaseBillar
+import com.example.billarapp.presentation.view.AddProductoToCuenta
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.postgrest
 import kotlinx.coroutines.launch
@@ -18,7 +19,56 @@ import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 
+suspend fun getProductosFromDataBaseWithIdBillarFilter(id_Billar: Int): List<ProductoModel>{
+    return  try {
+        val response = supabaseBillar()
+            .postgrest
+            .from("Productos")
+            .select {
+                filter {
+                    eq("id_billar",id_Billar)
+                }
+            }
+        val rawJson = response.data?:"Respuesta vacia"
+        val jsonArray = Json.parseToJsonElement(rawJson).jsonArray
+        jsonArray.map{jsonElement ->
+            val jsonObject=jsonElement.jsonObject
+            ProductoModel(
+                id_producto = jsonObject["id_producto"]?.jsonPrimitive?.content?.toIntOrNull()?:0,
+                id_proveedor = jsonObject["id_proveedor"]?.jsonPrimitive?.content?.toIntOrNull()?:0,
+                det_producto = jsonObject["det_producto"]?.jsonPrimitive?.content ?: "",
+                precio = jsonObject["precio"]?.jsonPrimitive?.content?.toDoubleOrNull()?:0.0,
+                Cantidad_Inv = jsonObject["Cantidad_Inv"]?.jsonPrimitive?.content?.toIntOrNull()?:0,
+            )
 
+        }
+    }catch (e: Exception){
+        emptyList()
+
+    }
+
+}
+
+suspend fun InsertProductoToCuenta(id_cuenta: Int,id_producto: Int,cantidad:Int):Boolean{
+    return try{
+        val productoConsumido = mapOf(
+            "id_cuenta" to id_cuenta,
+            "id_producto" to id_producto,
+            "cantidad" to cantidad,
+        )
+
+        supabaseBillar()
+            .postgrest
+            .from("productos_consumidos")
+            .insert(productoConsumido)
+
+        true
+    }catch (e:Exception){
+        println(e.message)
+        false
+
+    }
+}
 
 
 suspend fun getProductosFromDataBase(): List<ProductoModel>{

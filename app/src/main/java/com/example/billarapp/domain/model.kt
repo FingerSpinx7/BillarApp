@@ -37,3 +37,11 @@ data class ProveedoresModel(
     val nombre: String
 
 )
+
+@kotlinx.serialization.Serializable
+data class CuentaModel(
+    val id_proveedor: Int,
+    val telefono: Long,
+    val nombre: String
+
+)

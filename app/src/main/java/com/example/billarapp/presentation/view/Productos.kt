@@ -327,7 +327,8 @@ private fun ProductosScreen() {
                                     )
                                 }
                             }
-                        }else{Button(
+                        }else{
+                            Button(
                             onClick = {               /*Cambiar actividad a Editar producto*/
                                 val intent = Intent(context, EditarProducto::class.java).apply {
                                     putExtra("producto",productosSeleccionados.first())
