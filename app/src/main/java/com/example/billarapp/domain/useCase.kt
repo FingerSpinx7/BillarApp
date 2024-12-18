@@ -9,12 +9,10 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.text.input.TextFieldValue
 import com.example.billarapp.data.network.supabaseBillar
-import com.example.billarapp.presentation.view.AddProductoToCuenta
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.postgrest
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
@@ -49,8 +47,27 @@ suspend fun getProductosFromDataBaseWithIdBillarFilter(id_Billar: Int): List<Pro
 
 }
 
-suspend fun InsertProductoToCuenta(id_cuenta: Int,id_producto: Int,cantidad:Int):Boolean{
-    return try{
+suspend fun AddMesasABillar(id_billar: Int,numero_de_mesa: Int,tipo:String){
+    try {
+        val mesaAgregada = CuentaModel(
+            id_billar,
+            numero_de_mesa,
+            tipo.trim()
+        )
+        supabaseBillar()
+            .postgrest
+            .from("mesa")
+            .insert(mesaAgregada)
+
+    }catch (e:Exception){
+        Log.e("dbg","Fallo en: ${e.message}")
+    }
+}
+
+
+
+suspend fun InsertProductoToCuenta(id_cuenta: Int,id_producto: Int,cantidad:Int){
+    try{
         val productoConsumido = mapOf(
             "id_cuenta" to id_cuenta,
             "id_producto" to id_producto,
@@ -62,10 +79,10 @@ suspend fun InsertProductoToCuenta(id_cuenta: Int,id_producto: Int,cantidad:Int)
             .from("productos_consumidos")
             .insert(productoConsumido)
 
-        true
+
     }catch (e:Exception){
         println(e.message)
-        false
+
 
     }
 }

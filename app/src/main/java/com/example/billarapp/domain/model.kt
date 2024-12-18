@@ -1,10 +1,8 @@
 package com.example.billarapp.domain
 
 import android.os.Parcelable
-import androidx.compose.runtime.MutableState
-import androidx.compose.ui.text.input.TextFieldValue
 import kotlinx.parcelize.Parcelize
-import kotlinx.serialization.Contextual
+import kotlinx.serialization.SerialName
 
 @Parcelize
 @kotlinx.serialization.Serializable
@@ -40,8 +38,11 @@ data class ProveedoresModel(
 
 @kotlinx.serialization.Serializable
 data class CuentaModel(
-    val id_proveedor: Int,
-    val telefono: Long,
-    val nombre: String
+    @SerialName("id_billar")
+    val id_billar: Int,
+    @SerialName("Numero_de_mesa")
+    val Numero_de_mesa: Int,
+    @SerialName("tipo_mesa")
+    val tipo_mesa: String
 
 )

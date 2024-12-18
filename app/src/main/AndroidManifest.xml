@@ -15,14 +15,17 @@
         android:theme="@style/Theme.BillarApp"
         tools:targetApi="31">
         <activity
-            android:name=".presentation.view.AddProductoToCuenta"
+            android:name=".presentation.view.AddMesas"
             android:exported="true" >
-        <intent-filter>
-            <action android:name="android.intent.action.MAIN" />
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
 
-            <category android:name="android.intent.category.LAUNCHER" />
-        </intent-filter>
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
+        <activity
+            android:name=".presentation.view.AddProductoToCuenta"
+            android:exported="true"/>
         <activity
             android:name=".presentation.view.EditarProducto"
             android:exported="false" />
@@ -31,7 +34,7 @@
             android:exported="false" />
         <activity
             android:name=".presentation.view.Productos"
-            android:exported="false"/>
+            android:exported="false" />
         <activity
             android:name=".pruebas"
             android:exported="true" />
