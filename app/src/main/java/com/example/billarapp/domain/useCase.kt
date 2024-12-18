@@ -101,3 +101,48 @@ suspend fun eliminarProveedor(proveedor: ModeloProveedor): Boolean {
     }
 }
 
+//Obtención de usuarios
+@Composable
+fun getHistorialFromDatabase(fecha: String? = null): SnapshotStateList<HistorialModel> {
+    val historial = remember { mutableStateListOf<HistorialModel>() }
+
+    LaunchedEffect(fecha) {
+        try {
+            val query = supabaseBillar()
+                .postgrest
+                .from("cuenta")
+                .select {
+                    if (fecha != null) {
+                        filter { eq("fecha_inicio::text", "$fecha%") }
+                    }
+                }
+
+            val data = query.decodeList<HistorialModel>()
+            historial.clear()
+            historial.addAll(data)
+
+        } catch (e: Exception) {
+            Log.e("ErrorHistorial", "Error al obtener historial: ${e.message}")
+        }
+    }
+
+    return historial
+}
+
+
+
+suspend fun getDetallesHistorial(idCuenta: Int): List<ProductoConsumido> {
+    return try {
+        val response = supabaseBillar()
+            .postgrest
+            .from("productos_consumidos")
+            .select {
+                filter { eq("id_cuenta", idCuenta) }
+            }
+            .decodeList<ProductoConsumido>()
+        response
+    } catch (e: Exception) {
+        Log.e("ErrorDetalles", "Error al obtener detalles: ${e.message}")
+        emptyList()
+    }
+}

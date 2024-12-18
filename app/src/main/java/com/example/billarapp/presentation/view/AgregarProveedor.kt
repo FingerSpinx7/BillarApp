@@ -85,6 +85,11 @@ fun PantallaAgregarProveedor() {
     var mostrarDialogoConfirmacion by remember { mutableStateOf(false) }
     var mostrarDialogoExito by remember { mutableStateOf(false) }
     var mostrarDialogoEliminar by remember { mutableStateOf(false) }
+    var mensajeExitoEliminacion by remember { mutableStateOf("") }
+    var mostrarDialogoExitoEliminacion by remember { mutableStateOf(false) }
+    var mensajeErrorEliminacion by remember { mutableStateOf("") }
+    var mostrarDialogoErrorEliminacion by remember { mutableStateOf(false) }
+
     fun cargarProveedores() {
         coroutineScope.launch {
             try {
@@ -168,13 +173,30 @@ fun PantallaAgregarProveedor() {
                 TextButton(
                     onClick = {
                         coroutineScope.launch {
-                            proveedoresSeleccionados.forEach { proveedor ->
-                                val resultado = eliminarProveedor(proveedor)
-                                if (resultado) {
-                                    proveedores.remove(proveedor)
+                            try {
+                                var eliminados = 0
+                                proveedoresSeleccionados.forEach { proveedor ->
+                                    val resultado = eliminarProveedor(proveedor)
+                                    if (resultado) {
+                                        proveedores.remove(proveedor)
+                                        eliminados++
+                                    }
                                 }
+                                if (eliminados > 0) {
+                                    mensajeExitoEliminacion = if (eliminados == 1) {
+                                        "Proveedor eliminado con éxito"
+                                    } else {
+                                        "$eliminados proveedores eliminados con éxito"
+                                    }
+                                    mostrarDialogoExitoEliminacion = true
+                                }
+                            } catch (e: Exception) {
+                                // Manejar error si no se puede eliminar por relaciones en la DB
+                                mensajeErrorEliminacion = "No se puede eliminar el proveedor porque está relacionado con productos."
+                                mostrarDialogoErrorEliminacion = true
+                            } finally {
+                                proveedoresSeleccionados.clear()
                             }
-                            proveedoresSeleccionados.clear()
                         }
                         mostrarDialogoEliminar = false
                     }
@@ -185,6 +207,34 @@ fun PantallaAgregarProveedor() {
             dismissButton = {
                 TextButton(onClick = { mostrarDialogoEliminar = false }) {
                     Text("No")
+                }
+            }
+        )
+    }
+
+// Diálogo de éxito al eliminar
+    if (mostrarDialogoExitoEliminacion) {
+        AlertDialog(
+            onDismissRequest = { mostrarDialogoExitoEliminacion = false },
+            title = { Text("Éxito") },
+            text = { Text(mensajeExitoEliminacion) },
+            confirmButton = {
+                TextButton(onClick = { mostrarDialogoExitoEliminacion = false }) {
+                    Text("OK")
+                }
+            }
+        )
+    }
+
+// Diálogo de error al eliminar
+    if (mostrarDialogoErrorEliminacion) {
+        AlertDialog(
+            onDismissRequest = { mostrarDialogoErrorEliminacion = false },
+            title = { Text("Error") },
+            text = { Text(mensajeErrorEliminacion) },
+            confirmButton = {
+                TextButton(onClick = { mostrarDialogoErrorEliminacion = false }) {
+                    Text("OK")
                 }
             }
         )

@@ -14,18 +14,16 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.BillarApp"
         tools:targetApi="31">
-        <activity
-            android:name=".presentation.view.Productos"
-            android:exported="true">
-        </activity>
 
+        <!-- Actividad principal -->
         <activity
-            android:name=".presentation.view.AgregarProveedor"
+            android:name=".presentation.view.HistorialUsuarios"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
     </application>
 </manifest>
