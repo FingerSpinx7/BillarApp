@@ -110,10 +110,10 @@ fun getHistorialFromDatabase(fecha: String? = null): SnapshotStateList<Historial
         try {
             val query = supabaseBillar()
                 .postgrest
-                .from("cuenta")
+                .from("cuenta_view")
                 .select {
                     if (fecha != null) {
-                        filter { eq("fecha_inicio::text", "$fecha%") }
+                        filter { eq("fecha_inicio", fecha) } // La comparación es directa
                     }
                 }
 
@@ -128,6 +128,7 @@ fun getHistorialFromDatabase(fecha: String? = null): SnapshotStateList<Historial
 
     return historial
 }
+
 
 
 
