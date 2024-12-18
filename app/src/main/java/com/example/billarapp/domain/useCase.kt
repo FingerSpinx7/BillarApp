@@ -1,4 +1,5 @@
 package com.example.billarapp.domain
+
 import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -226,4 +227,114 @@ fun getDetalleProductosConsumidos(idCuenta: Int): SnapshotStateList<DetalleProdu
         }
     }
     return detalles
+}
+
+suspend fun fetchProveedoresFromDatabase(): List<ModeloProveedor> {
+    return try {
+        val response = supabaseBillar()
+            .postgrest
+            .from("proveedor")
+            .select()
+        val rawJson = response.data ?: "Respuesta vacía"
+        val jsonArray = Json.parseToJsonElement(rawJson).jsonArray
+        jsonArray.map { jsonElement ->
+            val jsonObject = jsonElement.jsonObject
+            ModeloProveedor(
+                id_proveedor = jsonObject["id_proveedor"]?.jsonPrimitive?.content?.toIntOrNull() ?: 0,
+                nombre = jsonObject["nombre"]?.jsonPrimitive?.content ?: "",
+                telefono = jsonObject["telefono"]?.jsonPrimitive?.content ?: ""
+            )
+        }
+    } catch (e: Exception) {
+        emptyList()
+    }
+}
+
+
+suspend fun agregarProveedorDB(nombre: String, telefono: String): Boolean {
+    return try {
+        val clienteSupabase = supabaseBillar()
+
+        val proveedor = mapOf(
+            "nombre" to nombre.trim(),
+            "telefono" to telefono.trim()
+        )
+        Log.d("ProveedorDebug", "Enviando proveedor: $proveedor")
+
+        clienteSupabase
+            .postgrest
+            .from("proveedor")
+            .insert(proveedor)
+
+        Log.d("ProveedorDebug", "Inserción exitosa")
+        true
+    } catch (e: Exception) {
+        Log.e("ErrorAgregarProveedor", "Error detallado: ", e)
+        Log.e("ErrorAgregarProveedor", "Mensaje: ${e.message}")
+        false
+    }
+}
+
+suspend fun eliminarProveedor(proveedor: ModeloProveedor): Boolean {
+    return try {
+        val clienteSupabase = supabaseBillar()
+        val response = clienteSupabase.postgrest
+            .from(table = "proveedor")
+            .delete {
+                filter {
+                    eq(column = "id_proveedor", proveedor.id_proveedor)
+                }
+            }
+        response.data != null // Si la respuesta tiene datos, la operación fue exitosa
+    } catch (e: Exception) {
+        Log.e("ErrorEliminarProveedor", "Error detallado: ${e.message}")
+        false
+    }
+}
+
+//Obtención de usuarios
+@Composable
+fun getHistorialFromDatabase(fecha: String? = null): SnapshotStateList<HistorialModel> {
+    val historial = remember { mutableStateListOf<HistorialModel>() }
+
+    LaunchedEffect(fecha) {
+        try {
+            val query = supabaseBillar()
+                .postgrest
+                .from("cuenta_view")
+                .select {
+                    if (fecha != null) {
+                        filter { eq("fecha_inicio", fecha) } // La comparación es directa
+                    }
+                }
+
+            val data = query.decodeList<HistorialModel>()
+            historial.clear()
+            historial.addAll(data)
+
+        } catch (e: Exception) {
+            Log.e("ErrorHistorial", "Error al obtener historial: ${e.message}")
+        }
+    }
+
+    return historial
+}
+
+
+
+
+suspend fun getDetallesHistorial(idCuenta: Int): List<ProductoConsumido> {
+    return try {
+        val response = supabaseBillar()
+            .postgrest
+            .from("productos_consumidos")
+            .select {
+                filter { eq("id_cuenta", idCuenta) }
+            }
+            .decodeList<ProductoConsumido>()
+        response
+    } catch (e: Exception) {
+        Log.e("ErrorDetalles", "Error al obtener detalles: ${e.message}")
+        emptyList()
+    }
 }

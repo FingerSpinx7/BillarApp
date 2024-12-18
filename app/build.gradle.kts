@@ -79,7 +79,19 @@ dependencies {
     implementation(platform(libs.supabase.bom))
     implementation(libs.supabase.postgrest)
     implementation(libs.ktor.client.android)
+    implementation(libs.androidx.swiperefreshlayout)
     implementation("com.github.Breens-Mbaka:BeeTablesCompose:1.0.5")
+    implementation ("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")
+    implementation ("androidx.lifecycle:lifecycle-runtime-compose:2.7.0")
+    // Para kotlinx.serialization
+    implementation ("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
+    implementation ("com.jakewharton.threetenabp:threetenabp:1.3.1")
+    implementation ("androidx.compose.material:material-icons-extended:1.5.0")
+    implementation ("androidx.compose.material3:material3:1.2.0-beta01")
+    implementation ("androidx.compose.ui:ui:1.5.1")
+    implementation ("androidx.compose.runtime:runtime:1.5.1")
+
+
     implementation ("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")
     implementation ("androidx.lifecycle:lifecycle-runtime-compose:2.7.0")
     implementation ("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
