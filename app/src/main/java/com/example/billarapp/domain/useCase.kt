@@ -16,6 +16,9 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
+import io.github.jan.supabase.postgrest.rpc
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 suspend fun getProductosFromDataBaseWithIdBillarFilter(id_Billar: Int): List<ProductoModel>{
     return  try {
@@ -186,3 +189,41 @@ suspend fun eliminarProducto(producto:ProductoModel):Boolean{
     }
 }
 
+
+suspend fun getCuentasFromDatabase(): List<CuentaModel> {
+    return try {
+        withContext(Dispatchers.IO) {
+            val data = supabaseBillar()
+                .from("cuenta")
+                .select()
+                .decodeList<CuentaModel>()
+            data
+        }
+    } catch (e: Exception) {
+        e.printStackTrace()
+        Log.e("dbg", "Error: ${e.message}")
+        emptyList()
+    }
+}
+
+
+@Composable
+fun getDetalleProductosConsumidos(idCuenta: Int): SnapshotStateList<DetalleProductosConsumidosModel> {
+    val detalles = remember { mutableStateListOf<DetalleProductosConsumidosModel>() }
+    val coroutineScope = rememberCoroutineScope()
+
+    LaunchedEffect(Unit) {
+        coroutineScope.launch {
+            try {
+                val data = supabaseBillar()
+                    .postgrest.rpc("filtrar_productos", mapOf("id_filtro" to idCuenta)) // Llama correctamente a la RPC
+                    .decodeList<DetalleProductosConsumidosModel>()
+                detalles.addAll(data)
+            } catch (e: Exception) {
+                e.printStackTrace()
+                println("Error: ${e.message}")
+            }
+        }
+    }
+    return detalles
+}
