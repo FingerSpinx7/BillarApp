@@ -19,7 +19,17 @@
 
         <activity
             android:name=".presentation.view.AddMesas"
-            android:exported="true" >
+            android:exported="true" />
+
+
+        <activity
+            android:name=".presentation.view.DetalleCuenta"
+            android:exported="true">
+        </activity>
+
+        <activity
+            android:name=".presentation.view.Cuentas"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -28,22 +38,17 @@
         </activity>
 
         <activity
-            android:name=".presentation.view.DetalleCuenta"
-            android:exported="true">
-        </activity>
-
-        <activity
             android:name=".presentation.view.AddProductoToCuenta"
             android:exported="true"/>
         <activity
             android:name=".presentation.view.EditarProducto"
-            android:exported="false" />
+            android:exported="true" />
         <activity
             android:name=".presentation.view.AnadirProd"
-            android:exported="false" />
+            android:exported="true" />
         <activity
             android:name=".presentation.view.Productos"
-            android:exported="false" />
+            android:exported="true" />
         <activity
             android:name=".pruebas"
             android:exported="true" />

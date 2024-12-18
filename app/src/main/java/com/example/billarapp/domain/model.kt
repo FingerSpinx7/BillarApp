@@ -37,7 +37,7 @@ data class ProveedoresModel(
 )
 
 @kotlinx.serialization.Serializable
-data class CuentaModel(
+data class CuentaModelL(
     @SerialName("id_billar")
     val id_billar: Int,
     @SerialName("Numero_de_mesa")

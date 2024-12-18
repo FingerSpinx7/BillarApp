@@ -52,7 +52,7 @@ suspend fun getProductosFromDataBaseWithIdBillarFilter(id_Billar: Int): List<Pro
 
 suspend fun AddMesasABillar(id_billar: Int,numero_de_mesa: Int,tipo:String){
     try {
-        val mesaAgregada = CuentaModel(
+        val mesaAgregada = CuentaModelL(
             id_billar,
             numero_de_mesa,
             tipo.trim()
