@@ -91,12 +91,12 @@ class AddMesas : AppCompatActivity() {
 
 @Composable
 private fun ShowContent(id_billar:Int){
-    AddMesasScreen(id_billar)
+    AddMesasScreen(id_billar, onNavigateToAdmin = {})
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun AddMesasScreen(id_billar:Int){
+fun AddMesasScreen(id_billar:Int, onNavigateToAdmin: () -> Unit){
     /*Variables y funciones*/
     val context = LocalContext.current
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
@@ -179,13 +179,16 @@ private fun AddMesasScreen(id_billar:Int){
         )
     }
 
-    if (mostrarDialogoExito){
+    if (mostrarDialogoExito) {
         AlertDialog(
-            onDismissRequest = {mostrarDialogoExito=false},
-            title = {Text("Resultado")},
+            onDismissRequest = { mostrarDialogoExito = false },
+            title = { Text("Resultado") },
             text = { Text("Mesas añadidas exitosamente") },
             confirmButton = {
-                TextButton(onClick = {mostrarDialogoExito=false}) {
+                TextButton(onClick = {
+                    mostrarDialogoExito = false
+                    onNavigateToAdmin() // Llama a la función para navegar a AdminScreen
+                }){
                     Text("Aceptar")
                 }
             }

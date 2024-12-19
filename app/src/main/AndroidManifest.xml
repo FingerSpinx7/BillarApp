@@ -19,8 +19,7 @@
 
         <activity
             android:name=".presentation.view.AddMesas"
-            android:exported="true">
-        </activity>
+            android:exported="true" />
         <activity
             android:name=".presentation.view.DetalleCuenta"
             android:exported="true">
@@ -29,7 +28,6 @@
         <activity
             android:name=".presentation.view.Cuentas"
             android:exported="true"/>
-
 
         <activity
             android:name=".presentation.view.AddProductoToCuenta"
@@ -47,10 +45,17 @@
             android:name=".pruebas"
             android:exported="true" />
         <activity
-            android:name=".presentation.view.DetalleMesa"
+            android:name=".presentation.view.HistorialUsuarios"
             android:exported="true"/>
         <activity
             android:name=".presentation.view.AgregarProveedor"
+            android:exported="true">
+        </activity>
+
+        <activity
+            android:name=".presentation.view.MainActivity"
+            android:configChanges="orientation|screenSize|keyboardHidden"
+            android:screenOrientation="portrait"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

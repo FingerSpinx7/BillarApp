@@ -24,6 +24,9 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
+import io.github.jan.supabase.postgrest.rpc
+import kotlinx.coroutines.withContext
+import kotlinx.datetime.LocalDateTime
 
 suspend fun getProductosFromDataBaseWithIdBillarFilter(id_Billar: Int): List<ProductoModel>{
     return  try {
@@ -381,3 +384,28 @@ suspend fun obtenerDetalleMesa(idCuenta: Int): DetalleMesaModel? {
     }
 }
 
+
+suspend fun InsertCuenta(id_billar: Int,cliente:String,Numero_mesa: Int):Boolean{
+    return try{
+        val cuenta = CuentaModelUpload(
+            id_billar,
+            cliente,
+            Numero_mesa,
+        )
+
+        supabaseBillar()
+            .postgrest
+            .from("cuenta")
+            .insert(cuenta)
+        true
+
+
+    }catch (e:Exception){
+        println(e.message)
+        false
+
+
+    }
+
+
+}
