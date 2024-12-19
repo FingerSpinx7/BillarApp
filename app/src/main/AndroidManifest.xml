@@ -19,7 +19,8 @@
 
         <activity
             android:name=".presentation.view.AddMesas"
-            android:exported="true" />
+            android:exported="true">
+        </activity>
         <activity
             android:name=".presentation.view.DetalleCuenta"
             android:exported="true">
@@ -49,7 +50,7 @@
             android:name=".presentation.view.HistorialUsuarios"
             android:exported="true"/>
         <activity
-            android:name=".presentation.view.AgregarProveedor"
+            android:name=".presentation.view.DetalleMesa"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

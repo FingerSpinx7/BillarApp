@@ -12,14 +12,18 @@ import androidx.compose.ui.text.input.TextFieldValue
 import com.example.billarapp.data.network.supabaseBillar
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.postgrest
+import io.github.jan.supabase.postgrest.rpc
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
-import io.github.jan.supabase.postgrest.rpc
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+
 
 suspend fun getProductosFromDataBaseWithIdBillarFilter(id_Billar: Int): List<ProductoModel>{
     return  try {
@@ -320,9 +324,6 @@ fun getHistorialFromDatabase(fecha: String? = null): SnapshotStateList<Historial
     return historial
 }
 
-
-
-
 suspend fun getDetallesHistorial(idCuenta: Int): List<ProductoConsumido> {
     return try {
         val response = supabaseBillar()
@@ -338,3 +339,33 @@ suspend fun getDetallesHistorial(idCuenta: Int): List<ProductoConsumido> {
         emptyList()
     }
 }
+
+suspend fun actualizarFechaCierreCuenta(idCuenta: Int): Boolean {
+    return try {
+        val fechaActual = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date())
+        // Aquí iría la lógica para actualizar la fecha en la base de datos
+        println("Fecha de cierre actualizada a $fechaActual para la cuenta $idCuenta")
+        true
+    } catch (e: Exception) {
+        e.printStackTrace()
+        false
+    }
+}
+
+suspend fun obtenerDetalleMesa(idCuenta: Int): DetalleMesaModel? {
+    return try {
+        // Simulación de obtención de datos
+        DetalleMesaModel(
+            id_cuenta = idCuenta,
+            numero_mesa = 1,
+            tipo_mesa = "Básica",
+            cliente = "Juan Pérez",
+            fecha_inicio = "2023-12-19 14:00:00",
+            fecha_fin = null
+        )
+    } catch (e: Exception) {
+        e.printStackTrace()
+        null
+    }
+}
+

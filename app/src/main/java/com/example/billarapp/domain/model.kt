@@ -1,9 +1,9 @@
 package com.example.billarapp.domain
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
 @Parcelize
 @kotlinx.serialization.Serializable
@@ -98,3 +98,14 @@ data class ProductoConsumido(
     @SerialName("cantidad")
     val cantidad: Int
 )
+
+@kotlinx.serialization.Serializable
+data class DetalleMesaModel(
+    val id_cuenta: Int,
+    val numero_mesa: Int,
+    val tipo_mesa: String,
+    val cliente: String,
+    val fecha_inicio: String,
+    val fecha_fin: String?
+)
+
