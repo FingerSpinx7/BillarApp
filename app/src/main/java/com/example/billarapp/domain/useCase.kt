@@ -12,13 +12,19 @@ import androidx.compose.ui.text.input.TextFieldValue
 import com.example.billarapp.data.network.supabaseBillar
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.postgrest
+import io.github.jan.supabase.postgrest.rpc
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+
 import io.github.jan.supabase.postgrest.rpc
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.LocalDateTime
 
@@ -279,19 +285,31 @@ suspend fun agregarProveedorDB(nombre: String, telefono: String): Boolean {
 suspend fun eliminarProveedor(proveedor: ModeloProveedor): Boolean {
     return try {
         val clienteSupabase = supabaseBillar()
+
+        // Verifica si el proveedor está relacionado con productos
+        val productosRelacionados = clienteSupabase.postgrest
+            .from("Productos")
+            .select { filter { eq("id_proveedor", proveedor.id_proveedor) } }
+            .decodeList<ProductoModel>()
+
+        if (productosRelacionados.isNotEmpty()) {
+            throw Exception("No se puede eliminar el proveedor porque está relacionado con productos.")
+        }
+
+        // Elimina el proveedor si no hay relaciones
         val response = clienteSupabase.postgrest
             .from(table = "proveedor")
             .delete {
-                filter {
-                    eq(column = "id_proveedor", proveedor.id_proveedor)
-                }
+                filter { eq(column = "id_proveedor", proveedor.id_proveedor) }
             }
-        response.data != null // Si la respuesta tiene datos, la operación fue exitosa
+
+        response.data != null
     } catch (e: Exception) {
         Log.e("ErrorEliminarProveedor", "Error detallado: ${e.message}")
-        false
+        throw e // Propaga la excepción para manejarla en la UI
     }
 }
+
 
 //Obtención de usuarios
 @Composable
@@ -321,9 +339,6 @@ fun getHistorialFromDatabase(fecha: String? = null): SnapshotStateList<Historial
     return historial
 }
 
-
-
-
 suspend fun getDetallesHistorial(idCuenta: Int): List<ProductoConsumido> {
     return try {
         val response = supabaseBillar()
@@ -339,6 +354,36 @@ suspend fun getDetallesHistorial(idCuenta: Int): List<ProductoConsumido> {
         emptyList()
     }
 }
+
+suspend fun actualizarFechaCierreCuenta(idCuenta: Int): Boolean {
+    return try {
+        val fechaActual = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date())
+        // Aquí iría la lógica para actualizar la fecha en la base de datos
+        println("Fecha de cierre actualizada a $fechaActual para la cuenta $idCuenta")
+        true
+    } catch (e: Exception) {
+        e.printStackTrace()
+        false
+    }
+}
+
+suspend fun obtenerDetalleMesa(idCuenta: Int): DetalleMesaModel? {
+    return try {
+        // Simulación de obtención de datos
+        DetalleMesaModel(
+            id_cuenta = idCuenta,
+            numero_mesa = 1,
+            tipo_mesa = "Básica",
+            cliente = "Juan Pérez",
+            fecha_inicio = "2023-12-19 14:00:00",
+            fecha_fin = null
+        )
+    } catch (e: Exception) {
+        e.printStackTrace()
+        null
+    }
+}
+
 
 suspend fun InsertCuenta(id_billar: Int,cliente:String,Numero_mesa: Int):Boolean{
     return try{
