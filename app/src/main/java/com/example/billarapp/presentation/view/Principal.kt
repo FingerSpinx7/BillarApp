@@ -36,10 +36,19 @@ fun MainComposable() {
             id_billar = 3, // Reemplaza con el ID dinámico si es necesario
             onNavigateToAdmin = { currentScreen.value = "admin" }
         )
-        "admin" -> AdminScreen(mesas = listOf("Mesa 1", "Mesa 2", "Mesa 3", "Mesa N"), // Lista de mesas
+        "admin" -> AdminScreen(
+            mesas = listOf("Mesa 1", "Mesa 2", "Mesa 3", "Mesa N"), // Lista de mesas
             onMesaClick = { mesaSeleccionada ->
                 println("Mesa seleccionada: $mesaSeleccionada")
-                // Agregar lógica para navegar o interactuar
+                // Agregar lógica para navegar o interactuar con la mesa seleccionada
+            },
+            onPoolClick = {
+                println("Botón POOL presionado")
+                // Agregar lógica para navegar o mostrar contenido relacionado con POOL
+            },
+            onCarambolaClick = {
+                println("Botón CARAMBOLA presionado")
+                // Agregar lógica para navegar o mostrar contenido relacionado con CARAMBOLA
             }
         )
     }
