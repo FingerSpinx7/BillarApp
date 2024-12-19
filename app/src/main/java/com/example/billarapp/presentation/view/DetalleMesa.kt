@@ -506,7 +506,7 @@ fun BotonesAccion(
 }
 
 fun navigateToAddProducto(context: Context, idCuenta: Int, numeroMesa: Int) {
-    val intent = Intent(context, DetalleMesa::class.java).apply {
+    val intent = Intent(context, AddProductoToCuenta::class.java).apply {
         putExtra("id_cuenta", idCuenta)
         putExtra("numero_mesa", numeroMesa)
     }
