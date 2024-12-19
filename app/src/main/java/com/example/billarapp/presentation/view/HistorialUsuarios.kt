@@ -16,7 +16,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
@@ -26,7 +25,6 @@ import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -155,14 +153,11 @@ fun PantallaHistorialUsuarios() {
                     ) {
                         // Campo Fecha
                         OutlinedTextField(
-                            value = fechaSeleccionada.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")),
-                            onValueChange = { },
-                            readOnly = true,
-                            label = { Text("Fecha", color = Color.White) },
+                            value = termBusqueda,
+                            onValueChange = { termBusqueda = it }, // Esto debe actualizar el estado
+                            label = { Text("Buscar cliente", color = Color.White) },
                             leadingIcon = {
-                                IconButton(onClick = { mostrarDatePicker = true }) {
-                                    Icon(Icons.Default.CalendarMonth, contentDescription = "Fecha", tint = Color(0xff99df5b))
-                                }
+                                Icon(Icons.Default.Search, contentDescription = "Buscar", tint = Color(0xff99df5b))
                             },
                             colors = OutlinedTextFieldDefaults.colors(
                                 focusedBorderColor = Color(0xff99df5b),
@@ -172,7 +167,7 @@ fun PantallaHistorialUsuarios() {
                             ),
                             modifier = Modifier
                                 .weight(1f)
-                                .padding(end = 8.dp)
+                                .padding(start = 8.dp)
                         )
 
                         // Campo Búsqueda

@@ -282,19 +282,31 @@ suspend fun agregarProveedorDB(nombre: String, telefono: String): Boolean {
 suspend fun eliminarProveedor(proveedor: ModeloProveedor): Boolean {
     return try {
         val clienteSupabase = supabaseBillar()
+
+        // Verifica si el proveedor está relacionado con productos
+        val productosRelacionados = clienteSupabase.postgrest
+            .from("Productos")
+            .select { filter { eq("id_proveedor", proveedor.id_proveedor) } }
+            .decodeList<ProductoModel>()
+
+        if (productosRelacionados.isNotEmpty()) {
+            throw Exception("No se puede eliminar el proveedor porque está relacionado con productos.")
+        }
+
+        // Elimina el proveedor si no hay relaciones
         val response = clienteSupabase.postgrest
             .from(table = "proveedor")
             .delete {
-                filter {
-                    eq(column = "id_proveedor", proveedor.id_proveedor)
-                }
+                filter { eq(column = "id_proveedor", proveedor.id_proveedor) }
             }
-        response.data != null // Si la respuesta tiene datos, la operación fue exitosa
+
+        response.data != null
     } catch (e: Exception) {
         Log.e("ErrorEliminarProveedor", "Error detallado: ${e.message}")
-        false
+        throw e // Propaga la excepción para manejarla en la UI
     }
 }
+
 
 //Obtención de usuarios
 @Composable

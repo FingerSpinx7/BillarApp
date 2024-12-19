@@ -47,10 +47,10 @@
             android:name=".pruebas"
             android:exported="true" />
         <activity
-            android:name=".presentation.view.HistorialUsuarios"
+            android:name=".presentation.view.DetalleMesa"
             android:exported="true"/>
         <activity
-            android:name=".presentation.view.DetalleMesa"
+            android:name=".presentation.view.AgregarProveedor"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

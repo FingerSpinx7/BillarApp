@@ -191,8 +191,8 @@ fun PantallaAgregarProveedor() {
                                     mostrarDialogoExitoEliminacion = true
                                 }
                             } catch (e: Exception) {
-                                // Manejar error si no se puede eliminar por relaciones en la DB
-                                mensajeErrorEliminacion = "No se puede eliminar el proveedor porque está relacionado con productos."
+                                // Maneja el error por relación con productos
+                                mensajeErrorEliminacion = e.message ?: "Error desconocido"
                                 mostrarDialogoErrorEliminacion = true
                             } finally {
                                 proveedoresSeleccionados.clear()
@@ -211,6 +211,7 @@ fun PantallaAgregarProveedor() {
             }
         )
     }
+
 
 // Diálogo de éxito al eliminar
     if (mostrarDialogoExitoEliminacion) {
