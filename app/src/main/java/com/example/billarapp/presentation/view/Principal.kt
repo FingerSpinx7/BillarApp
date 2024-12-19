@@ -30,7 +30,7 @@ fun MainComposable() {
         )
         "registro_billar" -> RegistroBillarScreen(
             onNavigateToBienvenida = { currentScreen.value = "bienvenida" },
-            onNavigateToAdmin = { currentScreen.value = "admin" }
+            onNavigateToMesas = { currentScreen.value = "mesas" }
         )
         "admin" -> AdminScreen(mesas = listOf("Mesa 1", "Mesa 2", "Mesa 3", "Mesa N"), // Lista de mesas
             onMesaClick = { mesaSeleccionada ->

@@ -17,7 +17,7 @@ import kotlinx.coroutines.launch
 import com.example.billarapp.data.network.*
 
 @Composable
-fun RegistroBillarScreen(onNavigateToBienvenida: () -> Unit, onNavigateToAdmin: () -> Unit) {
+fun RegistroBillarScreen(onNavigateToBienvenida: () -> Unit, onNavigateToMesas: () -> Unit) {
     val nombreBillar = remember { mutableStateOf(TextFieldValue()) }
     val calle = remember { mutableStateOf(TextFieldValue()) }
     val colonia = remember { mutableStateOf(TextFieldValue()) }
@@ -128,8 +128,6 @@ fun RegistroBillarScreen(onNavigateToBienvenida: () -> Unit, onNavigateToAdmin: 
                     Text("Regresar")
                 }
 
-                val context = LocalContext.current // Obtén el contexto actual
-
                 Button(
                     onClick = {
                         coroutineScope.launch {
@@ -195,7 +193,7 @@ fun RegistroBillarScreen(onNavigateToBienvenida: () -> Unit, onNavigateToAdmin: 
                         onClick = {
                             mostrarDialogo.value = false
                             if (mensajeDialogo.value.contains("correctamente", true)) {
-                                onNavigateToAdmin() // Navega a Admin solo si el registro fue exitoso
+                                onNavigateToMesas() // Navega a Mesas solo si el registro fue exitoso
                             }
                         },
                         colors = ButtonDefaults.buttonColors(
