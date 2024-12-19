@@ -37,7 +37,7 @@ import com.example.billarapp.data.network.verificarCredenciales
 
 
 @Composable
-fun LoginScreen(onRegisterClick: () -> Unit, onNavigateToBienvenida: () -> Unit) {
+fun LoginScreen(onRegisterClick: () -> Unit, onNavigateToBienvenida: () -> Unit, onNavigateToAdmin: () -> Unit) {
     // Estados para almacenar el usuario y contraseña
     val username = remember { mutableStateOf("") }
     val password = remember { mutableStateOf("") }
@@ -200,12 +200,17 @@ fun LoginScreen(onRegisterClick: () -> Unit, onNavigateToBienvenida: () -> Unit)
             // Botón de Login
             Button(
                 onClick = {
-                    val esValido = verificarCredenciales(context, username.value, password.value)
-                    if (esValido) {
-                        onNavigateToBienvenida() // Navega a la pantalla de bienvenida
+                    if (username.value == "Javi123_" && password.value == "javi") {
+                        onNavigateToAdmin() // Navega a AdminScreen si las credenciales coinciden
                     } else {
-                        Toast.makeText(context, "Usuario y/o contraseña incorrectos", Toast.LENGTH_LONG).show()
-                    } },
+                        val esValido = verificarCredenciales(context, username.value, password.value)
+                        if (esValido) {
+                            onNavigateToBienvenida() // Navega a la pantalla de bienvenida
+                        } else {
+                            Toast.makeText(context, "Usuario y/o contraseña incorrectos", Toast.LENGTH_LONG).show()
+                        }
+                    }
+                },
                 modifier = Modifier.height(40.dp).width(250.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color(0xff99df5b), // Fondo del botón
