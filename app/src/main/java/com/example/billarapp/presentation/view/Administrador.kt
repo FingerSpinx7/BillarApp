@@ -11,12 +11,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
 fun AdminScreen(mesas: List<String>, onMesaClick: (String) -> Unit, onPoolClick: () -> Unit, onCarambolaClick: () -> Unit) {
+    val configuration = LocalConfiguration.current
+    val isLandscape = configuration.screenWidthDp > configuration.screenHeightDp
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -33,7 +37,7 @@ fun AdminScreen(mesas: List<String>, onMesaClick: (String) -> Unit, onPoolClick:
                 style = MaterialTheme.typography.titleLarge,
                 color = Color(0xFF7FD238), // Verde
                 modifier = Modifier.padding(bottom = 16.dp),
-                fontSize = 24.sp
+                fontSize = if (isLandscape) 20.sp else 24.sp
             )
 
             LazyColumn(
@@ -45,7 +49,7 @@ fun AdminScreen(mesas: List<String>, onMesaClick: (String) -> Unit, onPoolClick:
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(horizontal = 8.dp)
-                            .height(60.dp),
+                            .height(if (isLandscape) 50.dp else 60.dp),
                         colors = CardDefaults.cardColors(
                             containerColor = Color(0xFF1E1E2C) // Color de la tarjeta
                         ),
@@ -78,7 +82,7 @@ fun AdminScreen(mesas: List<String>, onMesaClick: (String) -> Unit, onPoolClick:
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 8.dp),
+                    .padding(horizontal = if (isLandscape) 32.dp else 16.dp),
                 horizontalArrangement = Arrangement.SpaceAround
             ) {
                 Button(
@@ -93,7 +97,7 @@ fun AdminScreen(mesas: List<String>, onMesaClick: (String) -> Unit, onPoolClick:
                             tint = Color(0xFF7FD238),
                             modifier = Modifier.size(24.dp)
                         )
-                        Text("POOL", color = Color(0xFF7FD238), fontSize = 12.sp)
+                        Text("POOL", color = Color(0xFF7FD238), fontSize = if (isLandscape) 14.sp else 16.sp)
                     }
                 }
 
@@ -109,7 +113,7 @@ fun AdminScreen(mesas: List<String>, onMesaClick: (String) -> Unit, onPoolClick:
                             tint = Color(0xFF7FD238),
                             modifier = Modifier.size(24.dp)
                         )
-                        Text("CARAMBOLA", color = Color(0xFF7FD238), fontSize = 12.sp)
+                        Text("CARAMBOLA", color = Color(0xFF7FD238), fontSize = if (isLandscape) 14.sp else 16.sp)
                     }
                 }
             }

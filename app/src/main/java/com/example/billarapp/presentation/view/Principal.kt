@@ -18,7 +18,7 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun MainComposable() {
-    val currentScreen = remember { mutableStateOf("login") }
+    val currentScreen = remember { mutableStateOf("login")}
 
     when (currentScreen.value) {
         "login" -> LoginScreen(onRegisterClick = { currentScreen.value = "register" },
