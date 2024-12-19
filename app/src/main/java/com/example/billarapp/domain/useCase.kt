@@ -20,6 +20,7 @@ import kotlinx.serialization.json.jsonPrimitive
 import io.github.jan.supabase.postgrest.rpc
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import kotlinx.datetime.LocalDateTime
 
 suspend fun getProductosFromDataBaseWithIdBillarFilter(id_Billar: Int): List<ProductoModel>{
     return  try {
@@ -337,4 +338,29 @@ suspend fun getDetallesHistorial(idCuenta: Int): List<ProductoConsumido> {
         Log.e("ErrorDetalles", "Error al obtener detalles: ${e.message}")
         emptyList()
     }
+}
+
+suspend fun InsertCuenta(id_billar: Int,cliente:String,Numero_mesa: Int):Boolean{
+    return try{
+        val cuenta = CuentaModelUpload(
+            id_billar,
+            cliente,
+            Numero_mesa,
+        )
+
+        supabaseBillar()
+            .postgrest
+            .from("cuenta")
+            .insert(cuenta)
+        true
+
+
+    }catch (e:Exception){
+        println(e.message)
+        false
+
+
+    }
+
+
 }

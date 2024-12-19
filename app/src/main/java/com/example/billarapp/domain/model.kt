@@ -49,6 +49,18 @@ data class CuentaModelL(
 )
 
 @kotlinx.serialization.Serializable
+data class CuentaModelUpload(
+    @SerialName("id_billar")
+    val id_billar: Int,
+    @SerialName("cliente")
+    val cliente: String,
+    @SerialName("Numero_mesa")
+    val Numero_mesa: Int
+
+
+)
+
+@kotlinx.serialization.Serializable
 data class CuentaModel(
     val id_billar: Int,
     val id_cuenta: Int,
