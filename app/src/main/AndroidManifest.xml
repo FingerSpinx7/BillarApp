@@ -20,8 +20,6 @@
         <activity
             android:name=".presentation.view.AddMesas"
             android:exported="true" />
-
-
         <activity
             android:name=".presentation.view.DetalleCuenta"
             android:exported="true">
@@ -29,12 +27,8 @@
 
         <activity
             android:name=".presentation.view.Cuentas"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+            android:exported="true"/>
+
 
         <activity
             android:name=".presentation.view.AddProductoToCuenta"
@@ -51,7 +45,17 @@
         <activity
             android:name=".pruebas"
             android:exported="true" />
-
+        <activity
+            android:name=".presentation.view.HistorialUsuarios"
+            android:exported="true"/>
+        <activity
+            android:name=".presentation.view.AgregarProveedor"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.provider"

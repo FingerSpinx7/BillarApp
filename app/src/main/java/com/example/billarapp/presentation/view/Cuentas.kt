@@ -2,6 +2,7 @@ package com.example.billarapp.presentation.view
 
 import android.app.DatePickerDialog
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -34,12 +35,14 @@ import java.time.format.DateTimeFormatter
 import java.util.*
 import androidx.compose.material.icons.filled.ArrowBack
 import android.util.Log
+import androidx.annotation.RequiresApi
 import com.example.billarapp.domain.CuentaModel
 import com.example.billarapp.ui.theme.*
 
 
 
 class Cuentas : ComponentActivity() {
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         //val idBillarSeleccionado = intent.getIntExtra("idBillarSeleccionado", -1) //Valor temporal
@@ -49,6 +52,7 @@ class Cuentas : ComponentActivity() {
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun CuentasScreen(/*idBillarSeleccionado: Int*/) {
     val tableHeaders = listOf("Cuenta", "Mesa", "Abierto", "Fin", "Cliente")
@@ -295,6 +299,7 @@ fun CuentasScreen(/*idBillarSeleccionado: Int*/) {
     )
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 fun calcularTiempo(inicio: String, fin: String): String {
     val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss")
     val inicioTime = LocalDateTime.parse(inicio, formatter)
