@@ -4,9 +4,9 @@
     <!-- Tema principal de la aplicación -->
     <style name="Theme.BillarApp" parent="Theme.AppCompat.Light.DarkActionBar">
         <!-- Personaliza los colores -->
-        <item name="colorPrimary">@color/purple_500</item>
-        <item name="colorPrimaryDark">@color/purple_700</item>
-        <item name="colorAccent">@color/teal_200</item>
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryVariant</item>
+        <item name="colorAccent">@color/colorAccent</item>
     </style>
 
 </resources>
